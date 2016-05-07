@@ -1,7 +1,6 @@
 var client = require('../lib/UuapClient');
 var fs = require('fs');
 var URL = require('url');
-var request = require('request')
 
 exports.Login = function (callback) {
     var self = this;
