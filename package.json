@@ -1,0 +1,22 @@
+{
+  "name": "uuaper",
+  "version": "0.0.6",
+  "description": "baidu uuap auto login",
+  "main": "index.js",
+  "scripts": {
+    "test": "node ./test/index.js"
+  },
+  "keywords": [
+    "uuap",
+    "auto",
+    "login"
+  ],
+  "author": "gismanli",
+  "license": "ISC",
+  "engines": {
+    "node": "*"
+  },
+  "dependencies": {
+    "lodash": "^4.11.2"
+  }
+}
