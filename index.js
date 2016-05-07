@@ -27,5 +27,15 @@ Uuaper.prototype.Login = function (cb) {
 };
 
 Uuaper.prototype.getData = function (url, cb) {
-    return client.get(url, cb)
+    var self = this;
+    return client.get(url, function(err, res, data) {
+        if (res.statusCode == '302') {
+            global.isLogin = false;
+            self.Login(function() {
+                global.isLogin = true;
+                uuap.getData(url, cb)
+            })
+        }
+        return cb(err, res, data)
+    })
 };

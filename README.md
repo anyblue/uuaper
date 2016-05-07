@@ -25,15 +25,15 @@ var uuap = new uuaper({
 });
 
 if (!global.isLogin) {
-    uuap.Login(function(res){
+    uuap.Login(function(){
         global.isLogin = true;
-        uuap.getData(url, function (ret, res, data) {
+        uuap.getData(url, function (err, res, data) {
             console.log(data);
         })
     });
 }
 else {
-    uuap.getData(url, function (ret, res, data) {
+    uuap.getData(url, function (err, res, data) {
         console.log(data);
     })
 }
@@ -54,15 +54,15 @@ var uuap = new uuaper({
 app.use('/api', function (req, resp) {
     var url = 'xxx' + req.url;
     if (!global.isLogin) {
-        uuap.Login(function(res){
+        uuap.Login(function(){
             global.isLogin = true;
-            uuap.getData(url, function (ret, res, data) {
+            uuap.getData(url, function (err, res, data) {
                 resp.send(data);
             })
         });
     }
     else {
-        uuap.getData(url, function (ret, res, data) {
+        uuap.getData(url, function (err, res, data) {
             resp.send(data);
         })
     }

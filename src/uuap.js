@@ -34,7 +34,7 @@ exports._Login = function (cookies, callback) {
     })
 };
 
-function uuapPost (callback) {
+function uuapPost(callback) {
     var self = this;
 
     if (global.debug) log.info('登录中...');
@@ -65,7 +65,7 @@ function uuapPost (callback) {
             client.url_get(updateUrl, function(err, res, data) {
                 if (global.debug) log.info('登录成功');
                 fs.writeFile('./cookie.data', client.get_cookies());
-                callback(client)
+                callback()
             });
         });
     });

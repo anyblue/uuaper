@@ -9,15 +9,15 @@ var uuap = new uuaper({
 });
  
 if (!global.isLogin) {
-    uuap.Login(function(res){
+    uuap.Login(function(){
         global.isLogin = true;
-        uuap.getData('http://bidev.baidu.com/tic/common/getLoginUser', function (ret, res, data) {
+        uuap.getData('http://bidev.baidu.com/tic/common/getLoginUser', function (err, res, data) {
             console.log(data);
         })
     });
 }
 else {
-    uuap.getData('http://bidev.baidu.com/tic/common/getLoginUser', function (ret, res, data) {
+    uuap.getData('http://bidev.baidu.com/tic/common/getLoginUser', function (err, res, data) {
         console.log(data);
     })
 }
