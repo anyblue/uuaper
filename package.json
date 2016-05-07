@@ -1,6 +1,6 @@
 {
   "name": "uuaper",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "baidu uuap auto login",
   "main": "index.js",
   "scripts": {
@@ -15,6 +15,10 @@
   "license": "ISC",
   "engines": {
     "node": "*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gismanli/uuaper"
   },
   "dependencies": {
     "lodash": "^4.11.2"
