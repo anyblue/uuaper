@@ -33,7 +33,7 @@ Uuaper.prototype.getData = function (url, cb) {
             global.isLogin = false;
             self.Login(function() {
                 global.isLogin = true;
-                uuap.getData(url, cb)
+                self.getData(url, cb)
             })
         }
         return cb(err, res, data)
