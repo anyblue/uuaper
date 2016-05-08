@@ -19,8 +19,8 @@ var uuaper = require('uuaper');
 var uuap = new uuaper({
     username: 'xxx',
     passwork: 'xxx',
-    uuapServer: 'xxx',
-    dataServer: 'xxx',
+    uuapServer: 'http://xxx.baidu.com/login',
+    dataServer: 'http://yyy.baidu.com/',
     debug: false
 });
 
@@ -46,8 +46,8 @@ var uuaper = require('uuaper');
 var uuap = new uuaper({
     username: 'xxx',
     passwork: 'xxx',
-    uuapServer: 'xxx',
-    dataServer: 'xxx',
+    uuapServer: 'http://xxx.baidu.com/login',
+    dataServer: 'http://yyy.baidu.com/',
     debug: false
 });
 
@@ -76,8 +76,11 @@ app.use('/api', function (req, resp) {
 4. dataServer (数据服务器)
 5. debug (是否打开调试)
 
+#### 实例方法
+1. `Login(callback)` (会自动判断通过cookie还是重新登录，第一次调用即可)
+2. `getData(url, callback)` (请求数据，)
+
 ##TODO
 *  ~~支持配置项~~
-*  热切换账户
 *  优化结构
 *  Do more...
