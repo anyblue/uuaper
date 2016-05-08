@@ -26,11 +26,11 @@ var uuap = new uuaper({
 
 // 请求数据
 uuap.getData(url, function (ret, res, data) {
-    resp.send(data);
+    console.log(data);
 })
 ```
 
-#### 结合express使用实现数据mock功能
+#### 结合express使用实现接口转发功能
 
 ```js
 var uuaper = require('uuaper');
@@ -56,7 +56,6 @@ app.use('/api', function (req, resp) {
 3. uuapServer (uuap认证服务器)
 4. dataServer (数据服务器)
 5. debug (是否打开调试)
-
 
 #### 实例方法
 1. `Login(callback)` (会自动判断通过cookie还是重新登录，第一次调用即可)
