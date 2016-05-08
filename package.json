@@ -1,6 +1,6 @@
 {
   "name": "uuaper",
-  "version": "0.0.12",
+  "version": "0.1.1",
   "description": "baidu uuap auto login",
   "main": "index.js",
   "scripts": {

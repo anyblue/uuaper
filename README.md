@@ -24,19 +24,10 @@ var uuap = new uuaper({
     debug: false
 });
 
-if (!global.isLogin) {
-    uuap.Login(function(){
-        global.isLogin = true;
-        uuap.getData(url, function (err, res, data) {
-            console.log(data);
-        })
-    });
-}
-else {
-    uuap.getData(url, function (err, res, data) {
-        console.log(data);
-    })
-}
+// 请求数据
+uuap.getData(url, function (ret, res, data) {
+    resp.send(data);
+})
 ```
 
 #### 结合express使用实现数据mock功能
@@ -53,19 +44,9 @@ var uuap = new uuaper({
 
 app.use('/api', function (req, resp) {
     var url = 'xxx' + req.url;
-    if (!global.isLogin) {
-        uuap.Login(function(){
-            global.isLogin = true;
-            uuap.getData(url, function (err, res, data) {
-                resp.send(data);
-            })
-        });
-    }
-    else {
-        uuap.getData(url, function (err, res, data) {
-            resp.send(data);
-        })
-    }
+    uuap.getData(url, function (ret, res, data) {
+        resp.send(data);
+    })
 });
 ```
 
@@ -76,9 +57,10 @@ app.use('/api', function (req, resp) {
 4. dataServer (数据服务器)
 5. debug (是否打开调试)
 
+
 #### 实例方法
 1. `Login(callback)` (会自动判断通过cookie还是重新登录，第一次调用即可)
-2. `getData(url, callback)` (请求数据，)
+2. `getData(url, callback)` (请求数据)
 
 ##TODO
 *  ~~支持配置项~~

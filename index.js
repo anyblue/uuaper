@@ -13,17 +13,7 @@ var Uuaper = module.exports = function (options) {
 };
 
 Uuaper.prototype.Login = function (cb) {
-    var self = this;
-    fs.exists('./cookie.data', function (isExist) {
-        if (isExist) {
-            fs.readFile('./cookie.data', 'utf-8', function (err, data) {
-                login._Login(data, cb);
-            });
-        }
-        else {
-            login.Login(cb);
-        }
-    });
+    login.Login(cb);
 };
 
 Uuaper.prototype.getData = function (url, cb) {
@@ -35,7 +25,8 @@ Uuaper.prototype.getData = function (url, cb) {
                 global.isLogin = true;
                 self.getData(url, cb)
             })
+            return;
         }
-        return cb(err, res, data)
+        return cb(err, res, data);
     })
 };
