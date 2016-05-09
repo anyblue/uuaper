@@ -7,17 +7,13 @@ var uuap = new uuaper({
     dataServer: 'http://bidev.baidu.com/tic/',
     debug: false
 });
- 
-if (!global.isLogin) {
-    uuap.Login(function(){
-        global.isLogin = true;
-        uuap.getData('http://bidev.baidu.com/tic/common/getLoginUser', function (err, res, data) {
-            console.log(data);
-        })
-    });
-}
-else {
-    uuap.getData('http://bidev.baidu.com/tic/common/getLoginUser', function (err, res, data) {
-        console.log(data);
-    })
-}
+
+uuap.startServer({
+    port: 1337,
+    staticPath: __dirname,
+    proxyPath: ['/tic']
+});
+
+// uuap.getData('http://bidev.baidu.com/tic/common/getLoginUser', function (err, res, data) {
+//     console.log(data);
+// })

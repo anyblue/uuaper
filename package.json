@@ -1,6 +1,6 @@
 {
   "name": "uuaper",
-  "version": "0.1.2",
+  "version": "0.1.4",
   "description": "baidu uuap auto login",
   "main": "index.js",
   "scripts": {
@@ -21,6 +21,7 @@
     "url": "https://github.com/gismanli/uuaper"
   },
   "dependencies": {
+    "connect": "^3.4.1",
     "lodash": "^4.11.2"
   }
 }
