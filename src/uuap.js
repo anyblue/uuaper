@@ -9,7 +9,7 @@ exports.Login = function (callback) {
         if (isExist) {
             fs.readFile('./cookie.data', 'utf-8', function (err, data) {
                 if (global.debug) console.log('读取cookie文件成功');
-                client.set_cookies(data);
+                client.set_cookies(data || '');
                 client.get(global.dataServer, function(err, res, data){
                     if (res.statusCode == '302') {
                         require('child_process').exec('rm -rf ./cookie.data');

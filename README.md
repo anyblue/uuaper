@@ -18,7 +18,7 @@
 var uuaper = require('uuaper');
 var uuap = new uuaper({
     username: 'xxx',
-    passwork: 'xxx',
+    password: 'xxx',
     uuapServer: 'http://xxx.baidu.com/login',
     dataServer: 'http://yyy.baidu.com/',
     debug: false
@@ -36,7 +36,7 @@ uuap.getData(url, function (ret, res, data) {
 var uuaper = require('uuaper');
 var uuap = new uuaper({
     username: 'xxx',
-    passwork: 'xxx',
+    password: 'xxx',
     uuapServer: 'http://xxx.baidu.com/login',
     dataServer: 'http://yyy.baidu.com/',
     debug: false
