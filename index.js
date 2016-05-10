@@ -94,10 +94,10 @@ Uuaper.prototype.startServer = function (options) {
     if (options.proxyPath) {
         for (var i = 0; i < options.proxyPath.length; i++) {
             // 需要转发的
-            var proxy = (options.proxyPath[i].match(/(\w)/) === '/') ? options.proxyPath[i] : '/' + options.proxyPath[i]
+            var proxy = (options.proxyPath[i].match(/./)[0] === '/') ? options.proxyPath[i] : '/' + options.proxyPath[i]
             app.use(proxy, function barMiddleware(req, res, next) {
                 var tmp = url.parse(global.dataServer);
-                var dataurl = tmp.protocol + '//' + tmp.host + (tmp.port ? ':' + tmp.port : '') + req.originalUrl;
+                var dataurl = tmp.protocol + '//' + tmp.host  + req.originalUrl;
                 console.log('http://' + req.headers.host + req.originalUrl + '  ========>  ' + dataurl);
                 if (req.method === 'POST') {
                     var postData = '';
