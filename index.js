@@ -113,9 +113,26 @@ Uuaper.prototype.startServer = function (options) {
                     });
                 }
                 else {
-                    self.getData(dataurl, function (err, resp, data) {
-                        res.end(data);
-                    });
+                    if (dataurl.split('.').pop().match(/(png|jpg|gif|jpeg)/g)) {
+                        http.get(dataurl, function(resp){
+                            var imgData = '';
+                            resp.setEncoding('binary'); 
+                            resp.on('data', function(chunk){
+                                imgData+=chunk;
+                            });
+                            resp.on('end', function(){
+                                // tmp[i.replace(/\b(\w)|\s(\w)/g,function(v){return v.toUpperCase()})] = resp.headers[i]
+                                res.writeHead(resp.statusCode, resp.headers);
+                                res.write(imgData, 'binary');
+                                res.end();
+                            });
+                        });
+                    }
+                    else {
+                        self.getData(dataurl, function (err, resp, data) {
+                            res.end(data);
+                        });
+                    }
                 }
             });
         }
@@ -140,6 +157,6 @@ Uuaper.prototype.startServer = function (options) {
             }
         });
     });
-    http.createServer(app).listen(options.port || 3000);
-    console.log('Server running at http://127.0.0.1:' + (options.port || 3000) + '/');
+    http.createServer(app).listen(options.port || 1337);
+    console.log('Server running at http://127.0.0.1:' + (options.port || 1337) + '/');
 };

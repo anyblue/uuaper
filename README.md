@@ -30,7 +30,7 @@ uuap.getData(url, function (ret, res, data) {
 })
 
 // POST请求
-uuap.getData(url, {
+uuap.postData(url, {
     id: 1,
     name: 2
 }, function (ret, res, data) {
