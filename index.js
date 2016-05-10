@@ -39,7 +39,7 @@ var page_500 = function(req, res, error){
     res.write('<!doctype html>\n');
     res.write('<title>Internal Server Error</title>\n');
     res.write('<h1>Internal Server Error</h1>');
-    res.write('<pre>' + util.inspect(error) + '</pre>');
+    res.write('<pre>' + error + '</pre>');
 }
 
 var Uuaper = module.exports = function (options) {
@@ -94,9 +94,10 @@ Uuaper.prototype.startServer = function (options) {
     if (options.proxyPath) {
         for (var i = 0; i < options.proxyPath.length; i++) {
             // 需要转发的
-            app.use(options.proxyPath[i], function barMiddleware(req, res, next) {
+            var proxy = (options.proxyPath[i].match(/(\w)/) === '/') ? options.proxyPath[i] : '/' + options.proxyPath[i]
+            app.use(proxy, function barMiddleware(req, res, next) {
                 var tmp = url.parse(global.dataServer);
-                var dataurl = tmp.protocol + '//' + tmp.host + (tmp.path.split('')[tmp.path.split('').length - 1] == '/' ? tmp.path.substring(0, tmp.path.length - 1) : tmp.path) + req.url;
+                var dataurl = tmp.protocol + '//' + tmp.host + (tmp.port ? ':' + tmp.port : '') + req.originalUrl;
                 console.log('http://' + req.headers.host + req.originalUrl + '  ========>  ' + dataurl);
                 if (req.method === 'POST') {
                     var postData = '';
