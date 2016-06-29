@@ -77,7 +77,8 @@ function getCookie(cb) {
         username: options.username,
         password: options.password,
         uuapServer: options.uuapServer,
-        service: options.service,
+        service: options.service
+    }, function(cookie) {
         options.cookie = cookie;
         cb && cb();
         fs.writeFile('./cookie.data', cookie);
