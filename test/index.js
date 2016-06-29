@@ -8,11 +8,11 @@ var uuap = new uuaper({
     debug: false
 });
 
-uuap.startServer({
-    port: 1337,
-    staticPath: __dirname,
-    proxyPath: ['/tic']
-});
+// uuap.startServer({
+//     port: 1337,
+//     staticPath: __dirname,
+//     proxyPath: ['/tic']
+// });
 
 // uuap.getData('http://bidev.baidu.com/tic/common/getLoginUser', function (err, res, data) {
 //     console.log(data);
