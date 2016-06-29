@@ -65,5 +65,5 @@ app.use('/api', uuap.loadData);
 
 ## History
 
-- [1.0.0] 重构，使用[bird-auth](https://www.npmjs.com/package/bird-auth)包进行cookie获取，同时优化内置server
+- [1.0.x] 重构，使用[bird-auth](https://www.npmjs.com/package/bird-auth)包进行cookie获取，同时优化内置server
 - [0.1.7] 老版本
