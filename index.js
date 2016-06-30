@@ -40,7 +40,7 @@ Uuaper.prototype.loadData = function (req, res) {
         .send(req.body)
         .end(function(err, resp) {
             if (err) {
-                res.send('error');
+                res.send({error: 'uuaper error'});
             }
             else if (resp && (resp.req.path.match('login') || resp.text == '')) {
                 getCookie(function() {

@@ -1,6 +1,6 @@
 {
   "name": "uuaper",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "baidu uuap auto login",
   "main": "index.js",
   "scripts": {
@@ -21,7 +21,7 @@
     "url": "https://github.com/gismanli/uuaper"
   },
   "dependencies": {
-    "bird-auth": "^1.0.5",
+    "bird-auth": "^1.0.6",
     "body-parser": "^1.15.2",
     "express": "^4.14.0",
     "superagent": "^2.0.0"
