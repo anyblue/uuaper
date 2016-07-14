@@ -21,9 +21,9 @@ var Uuaper = module.exports = function (params) {
         password: params.password,
         uuapServer: params.uuapServer,
         service: params.service,
-        debug: params.debug || true,
-        mock: params.mock || false,
-        mockDir: params.mockDir || __dirname + '/mock'
+        debug: params.debug ? params.debug : false,
+        mock: params.mock ? params.mock : false,
+        mockDir: params.mockDir
     }
 
     // 某些项目比较奇葩
