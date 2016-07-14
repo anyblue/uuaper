@@ -21,7 +21,9 @@ var uuap = new uuaper({
     username: 'xxx',
     password: 'xxx',
     uuapServer: 'http://xxx.baidu.com/login',
-    service: 'http://yyy.baidu.com/'
+    service: 'http://yyy.baidu.com/',
+    mock: true,
+    mockDir: __dirname + '/mock'
 });
 
 uuap.startServer({
@@ -39,10 +41,17 @@ var uuap = new uuaper({
     username: 'xxx',
     password: 'xxx',
     uuapServer: 'http://xxx.baidu.com/login',
-    service: 'http://yyy.baidu.com/'
+    service: 'http://yyy.baidu.com/',
+    debug: true,
+    mockDir: __dirname + '/mock'
 });
 
 app.use('/api', uuap.loadData);
+
+// post/put等请求需配置
+var bodyParser = require('body-parser')
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({extended: true}))
 ```
 
 #### 配置项
@@ -52,6 +61,9 @@ app.use('/api', uuap.loadData);
 3. uuapServer (uuap认证服务器，记得带login参数)
 4. service (如果你不知道，你可以登出你的系统，然后取`service`参数)
 4. server (转发server默认会取service参数中的域，但是有些项目比较奇葩，故提供该参数)
+5. debug (是否打开转发信息，默认`false`不开启)
+6. mockDir (如果配置，则会在第一次接口请求结束后存储数据到文件)
+7. mock (是否启用mock本地数据，但是依赖`mockDir`参数，默认`false`不开启)
 
 #### 实例方法
 
@@ -66,6 +78,7 @@ app.use('/api', uuap.loadData);
 
 ## History
 
+- [1.1.0] 增加接口数据mock功能
 - [1.0.5] `server`参数改成非必须参数，默认取service中的域，但是有些项目比较奇葩，故提供该参数
 - [1.0.x] 重构，使用[bird-auth](https://www.npmjs.com/package/bird-auth)包进行cookie获取，同时优化内置server
 - [0.1.7] 老版本
