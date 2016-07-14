@@ -22,7 +22,7 @@ var Uuaper = module.exports = function (params) {
         uuapServer: params.uuapServer,
         service: params.service,
         debug: params.debug || true,
-        mock: params.mock || true,
+        mock: params.mock || false,
         mockDir: params.mockDir || __dirname + '/mock'
     }
 
