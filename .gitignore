@@ -2,3 +2,4 @@ node_modules
 cookie.data
 test/
 mock/
+.idea
