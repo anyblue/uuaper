@@ -22,7 +22,6 @@ var Uuaper = module.exports = function (params) {
         mockDir: params.mockDir
     }
 
-    // 某些项目比较奇葩
     if (!params.server) {
         var tmp  = url.parse(decodeURIComponent(params.service));
         options.server = tmp.protocol + '//' + tmp.hostname + (~~tmp.port ? ':' + tmp.port : '');
@@ -89,17 +88,15 @@ function getCookie(cb) {
 };
 
 function mockData(req, res) {
-    var tmp = req.originalUrl.match(/\?/i) ? req.originalUrl.match(/(.+)\?{1}/i)[1] : req.originalUrl;
-    fs.exists(options.mockDir + tmp + '.json', function (isExist) {
+    fs.exists(options.mockDir + req.originalUrl, function (isExist) {
         if (isExist) {
-            fs.readFile(options.mockDir + tmp + '.json', 'utf-8', function (err, data) {
-                if (options.debug) console.log(req.originalUrl + ' > ' + options.mockDir + tmp + '.json')
+            fs.readFile(options.mockDir + req.originalUrl, 'utf-8', function (err, data) {
+                if (options.debug) console.log(req.originalUrl + ' > ' + options.mockDir + req.originalUrl)
                 res.send(data);
             });
         }
         else {
             getData(req, res);
-            // res.send({error: 'uuaper error', message: "can't find file"});
         }
     });
 }
@@ -121,10 +118,9 @@ function getData(req, res) {
                         .end(function(err, resp) {
                             res.send(resp.text);
                             if (options.mockDir) {
-                                fs.exists(options.mockDir + req.originalUrl + '.json', function (isExist) {
+                                fs.exists(options.mockDir + req.originalUrl, function (isExist) {
                                     if (!isExist) {
-                                        var tmp = req.originalUrl.match(/\?/i) ? req.originalUrl.match(/(.+)\?{1}/i)[1] : req.originalUrl;
-                                        fsPath.writeFile(options.mockDir + tmp + '.json', resp.text);
+                                        fsPath.writeFile(options.mockDir + req.originalUrl, resp.text);
                                     }
                                 });
                             }
@@ -134,10 +130,9 @@ function getData(req, res) {
             else {
                 res.send(resp.text);
                 if (options.mockDir) {
-                    fs.exists(options.mockDir + req.originalUrl + '.json', function (isExist) {
+                    fs.exists(options.mockDir + req.originalUrl, function (isExist) {
                         if (!isExist) {
-                            var tmp = req.originalUrl.match(/\?/i) ? req.originalUrl.match(/(.+)\?{1}/i)[1] : req.originalUrl;
-                            fsPath.writeFile(options.mockDir + tmp + '.json', resp.text);
+                            fsPath.writeFile(options.mockDir + req.originalUrl, resp.text);
                         }
                     });
                 }
