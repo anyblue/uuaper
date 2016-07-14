@@ -19,7 +19,15 @@ var Uuaper = module.exports = function (params) {
     options.password = params.password;
     options.uuapServer = params.uuapServer;
     options.service = params.service;
-    options.server = params.server;
+
+    // 某些项目比较奇葩
+    if (!params.server) {
+        var tmp  = url.parse(decodeURIComponent(params.service))
+        options.server = tmp.protocol + '//' + tmp.hostname + (~~tmp.port ? ':' + tmp.port : '');
+    }
+    else {
+        options.server = params.server;
+    }
 
     fs.exists('./cookie.data', function (isExist) {
         if (isExist) {
@@ -34,8 +42,8 @@ var Uuaper = module.exports = function (params) {
 };
 
 Uuaper.prototype.loadData = function (req, res) {
-    // console.log(options.server + req.baseUrl + req.url)
-    request(req.method, options.server + req.baseUrl + req.url)
+    console.log(req.headers.origin + req.originalUrl + '  >>>  ' + options.server + req.originalUrl)
+    request(req.method, options.server + req.originalUrl)
         .set({Cookie: options.cookie})
         .send(req.body)
         .end(function(err, resp) {

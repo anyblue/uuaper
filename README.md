@@ -49,8 +49,9 @@ app.use('/api', uuap.loadData);
 
 1. username  (用户名)
 2. password  (密码)
-3. uuapServer (uuap认证服务器,记得带login参数)
-4. service (如果你不知道, 你可以登出你的系统，然后取`service`参数)
+3. uuapServer (uuap认证服务器，记得带login参数)
+4. service (如果你不知道，你可以登出你的系统，然后取`service`参数)
+4. server (转发server默认会取service参数中的域，但是有些项目比较奇葩，故提供该参数)
 
 #### 实例方法
 
@@ -65,5 +66,6 @@ app.use('/api', uuap.loadData);
 
 ## History
 
+- [1.0.5] `server`参数改成非必须参数，默认取service中的域，但是有些项目比较奇葩，故提供该参数
 - [1.0.x] 重构，使用[bird-auth](https://www.npmjs.com/package/bird-auth)包进行cookie获取，同时优化内置server
 - [0.1.7] 老版本
