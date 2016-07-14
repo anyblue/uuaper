@@ -1,0 +1,106 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/usr/local/Cellar/node4-lts/4.4.1/bin/node',
+1 verbose cli   '/usr/local/bin/npm',
+1 verbose cli   'publish' ]
+2 info using npm@2.14.20
+3 info using node@v4.4.1
+4 verbose publish [ '.' ]
+5 silly cache add args [ '.', null ]
+6 verbose cache add spec .
+7 silly cache add parsed spec Result {
+7 silly cache add   raw: '.',
+7 silly cache add   scope: null,
+7 silly cache add   name: null,
+7 silly cache add   rawSpec: '.',
+7 silly cache add   spec: '/Users/baidu/Desktop/gismanli/uuaper',
+7 silly cache add   type: 'directory' }
+8 verbose addLocalDirectory /Users/baidu/.npm/uuaper/1.1.1/package.tgz not in flight; packing
+9 verbose correctMkdir /Users/baidu/.npm correctMkdir not in flight; initializing
+10 verbose tar pack [ '/Users/baidu/.npm/uuaper/1.1.1/package.tgz',
+10 verbose tar pack   '/Users/baidu/Desktop/gismanli/uuaper' ]
+11 verbose tarball /Users/baidu/.npm/uuaper/1.1.1/package.tgz
+12 verbose folder /Users/baidu/Desktop/gismanli/uuaper
+13 info prepublish uuaper@1.1.1
+14 verbose addLocalTarball adding from inside cache /Users/baidu/.npm/uuaper/1.1.1/package.tgz
+15 verbose correctMkdir /Users/baidu/.npm correctMkdir not in flight; initializing
+16 silly cache afterAdd uuaper@1.1.1
+17 verbose afterAdd /Users/baidu/.npm/uuaper/1.1.1/package/package.json not in flight; writing
+18 verbose correctMkdir /Users/baidu/.npm correctMkdir not in flight; initializing
+19 verbose afterAdd /Users/baidu/.npm/uuaper/1.1.1/package/package.json written
+20 silly publish { name: 'uuaper',
+20 silly publish   version: '1.1.1',
+20 silly publish   description: 'baidu uuap auto login',
+20 silly publish   main: 'index.js',
+20 silly publish   scripts: { test: 'node ./test/index.js' },
+20 silly publish   keywords: [ 'uuap', 'auto', 'login' ],
+20 silly publish   author: { name: 'gismanli' },
+20 silly publish   license: 'MIT',
+20 silly publish   engines: { node: '*' },
+20 silly publish   repository:
+20 silly publish    { type: 'git',
+20 silly publish      url: 'git+https://github.com/gismanli/uuaper.git' },
+20 silly publish   dependencies:
+20 silly publish    { 'bird-auth': '^1.0.6',
+20 silly publish      'body-parser': '^1.15.2',
+20 silly publish      express: '^4.14.0',
+20 silly publish      'fs-path': '0.0.22',
+20 silly publish      superagent: '^2.0.0' },
+20 silly publish   readme: '## Uuaper\n\n~~baidu~~ 自动登录uuap\n\n## Features\n*   自动登录(cookie)\n\n## Get Start\n\n#### install\n\n``` bash\n    npm install --save uuaper\n```\n\n#### 使用uuaper内置server\n\n```js\nvar uuaper = require(\'uuaper\');\nvar uuap = new uuaper({\n    username: \'xxx\',\n    password: \'xxx\',\n    uuapServer: \'http://xxx.baidu.com/login\',\n    service: \'http://yyy.baidu.com/\',\n    mock: true,\n    mockDir: __dirname + \'/mock\'\n});\n\nuuap.startServer({\n    port: 1337, // server端口，不设置默认为1337\n    staticPath: __dirname, //静态资源路径，必须设置\n    proxyPath: [\'/tic\'] //Middleware路径\n});\n```\n\n#### 结合express使用实现接口转发功能\n\n```js\nvar uuaper = require(\'uuaper\');\nvar uuap = new uuaper({\n    username: \'xxx\',\n    password: \'xxx\',\n    uuapServer: \'http://xxx.baidu.com/login\',\n    service: \'http://yyy.baidu.com/\',\n    debug: true,\n    mockDir: __dirname + \'/mock\'\n});\n\napp.use(\'/api\', uuap.loadData);\n\n// post/put等请求需配置\nvar bodyParser = require(\'body-parser\')\napp.use(bodyParser.json())\napp.use(bodyParser.urlencoded({extended: true}))\n```\n\n#### 配置项\n\n1. username  (用户名)\n2. password  (密码)\n3. uuapServer (uuap认证服务器，记得带login参数)\n4. service (如果你不知道，你可以登出你的系统，然后取`service`参数)\n4. server (转发server默认会取service参数中的域，但是有些项目比较奇葩，故提供该参数)\n5. debug (是否打开转发信息，默认`false`不开启)\n6. mockDir (如果配置，则会在第一次接口请求结束后存储数据到文件)\n7. mock (是否启用mock本地数据，但是依赖`mockDir`参数，默认`false`不开启)\n\n#### 实例方法\n\n1. `startServer(options)` (启用内置server，无须单独处理POST/GET请求，如果自己有server就没必要调用该方法)\n\n##TODO\n\n*  ~~支持配置项~~\n*  数据mock\n*  优化结构\n*  Do more...\n\n## History\n\n- [1.1.0] 增加接口数据mock功能\n- [1.0.5] `server`参数改成非必须参数，默认取service中的域，但是有些项目比较奇葩，故提供该参数\n- [1.0.x] 重构，使用[bird-auth](https://www.npmjs.com/package/bird-auth)包进行cookie获取，同时优化内置server\n- [0.1.7] 老版本\n',
+20 silly publish   readmeFilename: 'README.md',
+20 silly publish   gitHead: '9b1fde4b86e094fa0b27d5fc8971fd1e24612d6a',
+20 silly publish   bugs: { url: 'https://github.com/gismanli/uuaper/issues' },
+20 silly publish   homepage: 'https://github.com/gismanli/uuaper#readme',
+20 silly publish   _id: 'uuaper@1.1.1',
+20 silly publish   _shasum: 'ceaa9650cbeef6830c6b2e8b589e7eb47a3b54fd',
+20 silly publish   _from: '.' }
+21 verbose getPublishConfig undefined
+22 silly mapToRegistry name uuaper
+23 silly mapToRegistry using default registry
+24 silly mapToRegistry registry https://registry.npmjs.org/
+25 silly mapToRegistry uri https://registry.npmjs.org/uuaper
+26 verbose publish registryBase https://registry.npmjs.org/
+27 silly publish uploading /Users/baidu/.npm/uuaper/1.1.1/package.tgz
+28 verbose request uri https://registry.npmjs.org/uuaper
+29 verbose request sending authorization for write operation
+30 info attempt registry request try #1 at 3:20:49 PM
+31 verbose request using bearer token for auth
+32 verbose request id 7bafd450b52534f4
+33 http request PUT https://registry.npmjs.org/uuaper
+34 http 403 https://registry.npmjs.org/uuaper
+35 verbose headers { 'content-type': 'application/json',
+35 verbose headers   'cache-control': 'max-age=300',
+35 verbose headers   'content-length': '95',
+35 verbose headers   'accept-ranges': 'bytes',
+35 verbose headers   date: 'Thu, 14 Jul 2016 07:20:49 GMT',
+35 verbose headers   via: '1.1 varnish',
+35 verbose headers   connection: 'keep-alive',
+35 verbose headers   'x-served-by': 'cache-nrt6122-NRT',
+35 verbose headers   'x-cache': 'MISS',
+35 verbose headers   'x-cache-hits': '0',
+35 verbose headers   'x-timer': 'S1468480849.222754,VS0,VE461',
+35 verbose headers   vary: 'Accept-Encoding' }
+36 verbose request invalidating /Users/baidu/.npm/registry.npmjs.org/uuaper on PUT
+37 error publish Failed PUT 403
+38 verbose stack Error: "You cannot publish over the previously published version 1.1.1." : uuaper
+38 verbose stack     at makeError (/usr/local/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:264:12)
+38 verbose stack     at CachingRegistryClient.<anonymous> (/usr/local/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:252:14)
+38 verbose stack     at Request._callback (/usr/local/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:172:14)
+38 verbose stack     at Request.self.callback (/usr/local/lib/node_modules/npm/node_modules/request/request.js:199:22)
+38 verbose stack     at emitTwo (events.js:87:13)
+38 verbose stack     at Request.emit (events.js:172:7)
+38 verbose stack     at Request.<anonymous> (/usr/local/lib/node_modules/npm/node_modules/request/request.js:1036:10)
+38 verbose stack     at emitOne (events.js:82:20)
+38 verbose stack     at Request.emit (events.js:169:7)
+38 verbose stack     at IncomingMessage.<anonymous> (/usr/local/lib/node_modules/npm/node_modules/request/request.js:963:12)
+39 verbose statusCode 403
+40 verbose pkgid uuaper
+41 verbose cwd /Users/baidu/Desktop/gismanli/uuaper
+42 error Darwin 14.5.0
+43 error argv "/usr/local/Cellar/node4-lts/4.4.1/bin/node" "/usr/local/bin/npm" "publish"
+44 error node v4.4.1
+45 error npm  v2.14.20
+46 error code E403
+47 error "You cannot publish over the previously published version 1.1.1." : uuaper
+48 error If you need help, you may report this error at:
+48 error     <https://github.com/npm/npm/issues>
+49 verbose exit [ 1, true ]
