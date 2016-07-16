@@ -19,7 +19,8 @@ var Uuaper = module.exports = function (params) {
         service: params.service,
         debug: params.debug ? params.debug : false,
         mock: params.mock ? params.mock : false,
-        mockDir: params.mockDir
+        mockDir: params.mockDir,
+        mockCache: params.mockCache ? params.mockCache : false
     }
 
     // 某些项目比较奇葩
@@ -121,7 +122,7 @@ function getData(req, res) {
                         .send(req.body)
                         .end(function(err, resp) {
                             res.send(resp.text);
-                            if (options.mockDir) {
+                            if (options.mockCache || options.mockDir) {
                                 fs.exists(options.mockDir + tmp + '.json', function (isExist) {
                                     if (!isExist) {
                                         fsPath.writeFile(options.mockDir + tmp + '.json', resp.text);
@@ -133,7 +134,7 @@ function getData(req, res) {
             }
             else {
                 res.send(resp.text);
-                if (options.mockDir) {
+                if (options.mockCache || options.mockDir) {
                     fs.exists(options.mockDir + tmp + '.json', function (isExist) {
                         if (!isExist) {
                             fsPath.writeFile(options.mockDir + tmp + '.json', resp.text);
