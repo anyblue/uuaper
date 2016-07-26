@@ -100,16 +100,27 @@ function mockData(req, res) {
         }
         else {
             getData(req, res);
-            // res.send({error: 'uuaper error', message: "can't find file"});
         }
     });
 }
 
 function getData(req, res) {
+
     if (options.debug) console.log(req.originalUrl + ' > ' + options.server + req.originalUrl);
+
     var tmp = req.originalUrl.match(/\?/i) ? req.originalUrl.match(/(.+)\?{1}/i)[1] : req.originalUrl;
-    request(req.method, options.server + req.originalUrl)
-        .set({Cookie: options.cookie})
+
+    // hack cookie
+    req.headers.cookie = options.cookie
+
+    if (req.originalUrl.match(/[\w]+[\.](avi|mpeg|3gp|mp3|mp4|wav|jpeg|gif|jpg|png|apk|exe|txt|html|zip|Java|doc|js)/g)) {
+        request(options.server + req.originalUrl)
+            .set(req.headers)
+            .pipe(res)
+    }
+    else {
+        request(req.method, options.server + req.originalUrl)
+        .set(req.headers)
         .send(req.body)
         .end(function(err, resp) {
             if (err && err.status != 403) {
@@ -118,7 +129,7 @@ function getData(req, res) {
             else if (resp && (resp.req.path.match('login') || resp.text == '' || (err && err.status == 403))) {
                 getCookie(function() {
                     request(req.method, options.server + req.baseUrl + req.url)
-                        .set({Cookie: options.cookie})
+                        .set(req.headers)
                         .send(req.body)
                         .end(function(err, resp) {
                             res.send(resp.text);
@@ -143,4 +154,5 @@ function getData(req, res) {
                 }
             }
         })
+    }    
 }

@@ -1,6 +1,6 @@
 ## Uuaper
 
-~~baidu~~ 自动登录uuap
+baidu 自动登录uuap
 
 ## Features
 *   自动登录(cookie)
@@ -76,13 +76,14 @@ app.use(bodyParser.urlencoded({extended: true}))
 *  ~~数据mock~~
 *  mock 支持带参数的url
 *  ~~mock no cache~~
+*  ~~静态资源文件proxy~~
 *  优化结构
 *  Do more...
 
 ## History
 
+- [1.2.0] 增加对静态资源文件的转发支持
 - [1.1.4] 增加`mockCache`参数，如果为`true`，则每次请求都会进行保存到本地的操作
-- [1.1.3] mock数据时,如果不存在,则会请求一次 && status 403 处理
 - [1.1.0] 增加接口数据mock功能
 - [1.0.5] `server`参数改成非必须参数，默认取service中的域，但是有些项目比较奇葩，故提供该参数
 - [1.0.x] 重构，使用[bird-auth](https://www.npmjs.com/package/bird-auth)包进行cookie获取，同时优化内置server
