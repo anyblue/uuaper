@@ -113,7 +113,7 @@ function getData(req, res) {
     // hack cookie
     req.headers.cookie = options.cookie
 
-    if (req.originalUrl.match(/[\w]+[\.](avi|mpeg|3gp|mp3|mp4|wav|jpeg|gif|jpg|png|apk|exe|txt|html|zip|Java|doc|js|css|tff|woff)/g)) {
+    if (req.originalUrl.match(/[\w]+[\.](avi|mpeg|3gp|mp3|mp4|wav|jpeg|gif|jpg|png|apk|exe|txt|html|zip|Java|doc|js|css|ttf|woff)/g)) {
         request(options.server + req.originalUrl)
             .set(req.headers)
             .pipe(res)
