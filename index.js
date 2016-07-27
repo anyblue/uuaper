@@ -16,7 +16,7 @@ var Uuaper = module.exports = function (params) {
         username: params.username,
         password: params.password,
         uuapServer: params.uuapServer,
-        service: params.service,
+        service: params.service.match(/%3A%2F%2F/ig) ? params.service : encodeURIComponent(params.service),
         debug: params.debug ? params.debug : false,
         mock: params.mock ? params.mock : false,
         mockDir: params.mockDir,
