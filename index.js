@@ -4,7 +4,6 @@ var fs = require('fs');
 var url = require('url');
 
 var request = require('superagent');
-var express = require('express');
 var bodyParser = require('body-parser');
 var birdAuth = require('bird-auth');
 var fsPath = require('fs-path');
@@ -12,6 +11,7 @@ var fsPath = require('fs-path');
 var options = {};
 
 var Uuaper = module.exports = function (params) {
+
     options = {
         username: params.username,
         password: params.password,
@@ -32,7 +32,20 @@ var Uuaper = module.exports = function (params) {
         options.server = params.server;
     }
 
-    getCookie();
+    if (params.express) {
+        params.express.use(bodyParser.json());
+        params.express.use(bodyParser.urlencoded({extended: true}));
+    }
+
+    if (params.cookie) {
+        if (options.debug) console.log('=====Custom Cookies Model=====')
+        options.custom = true;
+        options.cookie = params.cookie;
+    }
+    else {
+        if (options.debug) console.log('=====Auto Get Cookies Model=====')
+        getCookie();
+    }
 
     // fs.exists('./cookie.data', function (isExist) {
     //     if (isExist) {
@@ -47,7 +60,6 @@ var Uuaper = module.exports = function (params) {
 };
 
 Uuaper.prototype.loadData = function (req, res) {
-
     if (options.mock) {
         mockData(req, res);
         return;
@@ -59,6 +71,7 @@ Uuaper.prototype.loadData = function (req, res) {
 
 
 Uuaper.prototype.startServer = function (params) {
+    var express = require('express');
     var app = express();
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({extended: true}));
@@ -127,7 +140,7 @@ function getData(req, res) {
                 if (err && err.status != 403) {
                     res.send({error: 'uuaper get data error', message: err.status});
                 }
-                else if (resp && (resp.req.path.match('login') || resp.text == '' || (err && err.status == 403))) {
+                else if (!options.custom && resp && (resp.req.path.match('login') || resp.text == '' || (err && err.status == 403))) {
                     getCookie(function() {
                         request(req.method, options.server + req.baseUrl + req.url)
                             .set(req.headers)
