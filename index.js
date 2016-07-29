@@ -128,10 +128,18 @@ function getData(req, res) {
     // hack cookie
     req.headers.cookie = options.cookie
 
-    if (req.originalUrl.match(/[\w]+[\.](aviv|mpeg$|3gp$|mp3$|mp4$|wav$|jpeg$|gif$|jpg$|png$|apk$|exe$|txt$|html$|zip$|Java$|doc$|js$|css$|ttf$|woff$|csv$|docx$|doc$|xlsx$)/g)) {
-        request(req.method, options.server + req.originalUrl)
+    if (req.originalUrl.match(/[\w]+[\.](avi|mpeg|3gp|mp3|mp4|wav|jpeg|gif|jpg|png|apk|exe|txt|html|zip|Java|doc|js|css|ttf|woff|csv|doc|xlsx)/g)) {
+        var aa = request(options.server + req.originalUrl)
             .set(req.headers)
-            .send(req.body)
+            .on('response', function(resp) {
+                if (resp.get('Connection') == 'close') {
+                    getCookie();
+                    aa.write('<script>window.location.reload()</script>');
+                }
+                else {
+                    res.set({'Content-Type': resp.get('Content-Type')})
+                }
+            })
             .pipe(res)
     }
     else {
@@ -145,11 +153,12 @@ function getData(req, res) {
                 }
                 else if (!options.custom && resp && (resp.req.path.match('login') || resp.text == '' || (err && err.status == 403))) {
                     getCookie(function() {
+                        req.headers.cookie = options.cookie
                         request(req.method, options.server + req.baseUrl + req.url)
                             .set(req.headers)
                             .send(req.body)
                             .end(function(err, resp) {
-                                res.set(resp.headers)
+                                res.set({'Content-Type': resp.get('Content-Type')})
                                 res.send(resp.text);
                                 if (options.mockCache || options.mockDir) {
                                     fs.exists(options.mockDir + tmp + '.json', function (isExist) {
@@ -162,7 +171,7 @@ function getData(req, res) {
                     })
                 }
                 else {
-                    res.set(resp.headers)
+                    res.set({'Content-Type': resp.get('Content-Type')})
                     res.send(resp.text);
                     if (options.mockCache || options.mockDir) {
                         fs.exists(options.mockDir + tmp + '.json', function (isExist) {
