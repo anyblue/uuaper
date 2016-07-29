@@ -96,6 +96,8 @@ app.use(bodyParser.urlencoded({extended: true}))
 
 ## History
 
+
+- [1.2.6] res.headers原封不动返回，来解决流形式响应
 - [1.2.3] 增加cookie参数，如果配置，就不使用默认的uuap自动获取方式
 - [1.2.0] 增加对静态资源文件的转发支持
 - [1.1.4] 增加`mockCache`参数，如果为`true`，则每次请求都会进行保存到本地的操作

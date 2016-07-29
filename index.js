@@ -2,6 +2,7 @@
 
 var fs = require('fs');
 var url = require('url');
+var http = require('http');
 
 var request = require('superagent');
 var bodyParser = require('body-parser');
@@ -98,6 +99,7 @@ function getCookie(cb) {
         uuapServer: options.uuapServer,
         service: options.service
     }, function(cookie) {
+        if (options.debug) console.log('cookies: ' + cookie);
         options.cookie = cookie;
         // fs.writeFile('./cookie.data', cookie);
         cb && cb();
@@ -126,9 +128,10 @@ function getData(req, res) {
     // hack cookie
     req.headers.cookie = options.cookie
 
-    if (req.originalUrl.match(/[\w]+[\.](aviv|mpeg$|3gp$|mp3$|mp4$|wav$|jpeg$|gif$|jpg$|png$|apk$|exe$|txt$|html$|zip$|Java$|doc$|js$|css$|ttf$|woff$)/g)) {
-        request(options.server + req.originalUrl)
+    if (req.originalUrl.match(/[\w]+[\.](aviv|mpeg$|3gp$|mp3$|mp4$|wav$|jpeg$|gif$|jpg$|png$|apk$|exe$|txt$|html$|zip$|Java$|doc$|js$|css$|ttf$|woff$|csv$|docx$|doc$|xlsx$)/g)) {
+        request(req.method, options.server + req.originalUrl)
             .set(req.headers)
+            .send(req.body)
             .pipe(res)
     }
     else {
@@ -146,6 +149,7 @@ function getData(req, res) {
                             .set(req.headers)
                             .send(req.body)
                             .end(function(err, resp) {
+                                res.set(resp.headers)
                                 res.send(resp.text);
                                 if (options.mockCache || options.mockDir) {
                                     fs.exists(options.mockDir + tmp + '.json', function (isExist) {
@@ -158,6 +162,7 @@ function getData(req, res) {
                     })
                 }
                 else {
+                    res.set(resp.headers)
                     res.send(resp.text);
                     if (options.mockCache || options.mockDir) {
                         fs.exists(options.mockDir + tmp + '.json', function (isExist) {
