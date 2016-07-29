@@ -38,12 +38,12 @@ var Uuaper = module.exports = function (params) {
     }
 
     if (params.cookie) {
-        if (options.debug) console.log('=====Custom Cookies Model=====')
+        if (options.debug) console.log('===== Custom Cookies Mode =====')
         options.custom = true;
         options.cookie = params.cookie;
     }
     else {
-        if (options.debug) console.log('=====Auto Get Cookies Model=====')
+        if (options.debug) console.log('===== Auto Get Cookies Mode =====')
         getCookie();
     }
 
@@ -126,7 +126,7 @@ function getData(req, res) {
     // hack cookie
     req.headers.cookie = options.cookie
 
-    if (req.originalUrl.match(/[\w]+[\.](avi|mpeg|3gp|mp3|mp4|wav|jpeg|gif|jpg|png|apk|exe|txt|html|zip|Java|doc|js|css|ttf|woff)/g)) {
+    if (req.originalUrl.match(/[\w]+[\.](aviv|mpeg$|3gp$|mp3$|mp4$|wav$|jpeg$|gif$|jpg$|png$|apk$|exe$|txt$|html$|zip$|Java$|doc$|js$|css$|ttf$|woff$)/g)) {
         request(options.server + req.originalUrl)
             .set(req.headers)
             .pipe(res)
