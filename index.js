@@ -2,7 +2,6 @@
 
 var fs = require('fs');
 var url = require('url');
-var http = require('http');
 
 var request = require('superagent');
 var bodyParser = require('body-parser');
@@ -99,7 +98,7 @@ function getCookie(cb) {
         uuapServer: options.uuapServer,
         service: options.service
     }, function(cookie) {
-        if (options.debug) console.log('cookies: ' + cookie);
+        // if (options.debug) console.log('cookies: ' + cookie);
         options.cookie = cookie;
         // fs.writeFile('./cookie.data', cookie);
         cb && cb();
@@ -128,13 +127,13 @@ function getData(req, res) {
     // hack cookie
     req.headers.cookie = options.cookie
 
-    if (req.originalUrl.match(/[\w]+[\.](avi|mpeg|3gp|mp3|mp4|wav|jpeg|gif|jpg|png|apk|exe|txt|html|zip|Java|doc|js|css|ttf|woff|csv|doc|xlsx)/g)) {
-        var aa = request(options.server + req.originalUrl)
+    if (req.originalUrl.match(/[\w]+[\.](avi|mpeg|3gp|mp3|mp4|wav|jpeg|gif|jpg|png|apk|exe|txt|html|zip|Java|doc|js$|css|ttf|woff|csv|doc|xlsx)/g)) {
+        var tmp = request(options.server + req.originalUrl)
             .set(req.headers)
             .on('response', function(resp) {
                 if (resp.get('Connection') == 'close') {
                     getCookie();
-                    aa.write('<script>window.location.reload()</script>');
+                    tmp.write('<script>window.location.reload()</script>');
                 }
                 else {
                     res.set({'Content-Type': resp.get('Content-Type')})

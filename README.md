@@ -86,6 +86,7 @@ app.use(bodyParser.urlencoded({extended: true}))
 
 ##TODO
 
+*  ~~bprouting 302 deal~~
 *  ~~支持配置项~~
 *  ~~数据mock~~
 *  mock 支持带参数的url
