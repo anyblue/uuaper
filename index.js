@@ -150,7 +150,7 @@ function getData(req, res) {
                 if (err && err.status != 403) {
                     res.send({error: 'uuaper get data error', message: err.status});
                 }
-                else if (!options.custom && resp && (resp.req.path.match('login') || resp.text == '' || (err && err.status == 403))) {
+                else if (!options.custom && resp && (resp.req.path.match('login') || (err && err.status == 403))) {
                     getCookie(function() {
                         req.headers.cookie = options.cookie
                         request(req.method, options.server + req.baseUrl + req.url)
