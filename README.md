@@ -98,6 +98,7 @@ app.use(bodyParser.urlencoded({extended: true}))
 ## History
 
 
+- [1.2.8] 移除res.text空判断
 - [1.2.6] res.headers原封不动返回，来解决流形式响应
 - [1.2.3] 增加cookie参数，如果配置，就不使用默认的uuap自动获取方式
 - [1.2.0] 增加对静态资源文件的转发支持
