@@ -157,7 +157,10 @@ function getData(req, res) {
                             .set(req.headers)
                             .send(req.body)
                             .end(function(err, resp) {
-                                res.set({'Content-Type': resp.get('Content-Type')})
+                                if (resp.text != '') {
+                                    res.set(resp.headers)
+                                }
+                                // res.set({'Content-Type': resp.get('Content-Type')})
                                 res.send(resp.text);
                                 if (options.mockCache || options.mockDir) {
                                     fs.exists(options.mockDir + tmp + '.json', function (isExist) {
@@ -170,7 +173,10 @@ function getData(req, res) {
                     })
                 }
                 else {
-                    res.set({'Content-Type': resp.get('Content-Type')})
+                    if (resp.text != '') {
+                        res.set(resp.headers)
+                    }
+                    // res.set({'Content-Type': resp.get('Content-Type')})
                     res.send(resp.text);
                     if (options.mockCache || options.mockDir) {
                         fs.exists(options.mockDir + tmp + '.json', function (isExist) {
