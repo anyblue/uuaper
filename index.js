@@ -127,7 +127,7 @@ function getData(req, res) {
     // hack cookie
     req.headers.cookie = options.cookie
 
-    if (req.originalUrl.match(/[\w]+[\.](avi|mpeg|3gp|mp3|mp4|wav|jpeg|gif|jpg|png|apk|exe|txt|html|zip|Java|doc|js$|css|ttf|woff|csv|doc|xlsx)/g)) {
+    if (req.originalUrl.match(/[\w]+[\.](avi|mpeg|3gp|mp3|mp4|wav|jpeg|gif|jpg|png|apk|exe|txt|html|zip|Java|doc|js$|css|ttf|woff|csv|doc|xlsx|rar|7z)/g)) {
         var tmp = request(options.server + req.originalUrl)
             .set(req.headers)
             .on('response', function(resp) {
@@ -157,34 +157,38 @@ function getData(req, res) {
                             .set(req.headers)
                             .send(req.body)
                             .end(function(err, resp) {
-                                if (resp.text != '') {
+                                if (resp.text) {
+                                    res.set({'Content-Type': resp.get('Content-Type')})
+                                    if (options.mockCache || options.mockDir) {
+                                        fs.exists(options.mockDir + tmp + '.json', function (isExist) {
+                                            if (!isExist) {
+                                                fsPath.writeFile(options.mockDir + tmp + '.json', resp.text);
+                                            }
+                                        });
+                                    }
+                                }
+                                else {
                                     res.set(resp.headers)
                                 }
-                                // res.set({'Content-Type': resp.get('Content-Type')})
                                 res.send(resp.text);
-                                if (options.mockCache || options.mockDir) {
-                                    fs.exists(options.mockDir + tmp + '.json', function (isExist) {
-                                        if (!isExist) {
-                                            fsPath.writeFile(options.mockDir + tmp + '.json', resp.text);
-                                        }
-                                    });
-                                }
                             })
                     })
                 }
                 else {
-                    if (resp.text != '') {
+                    if (resp.text) {
+                        res.set({'Content-Type': resp.get('Content-Type')})
+                        if (options.mockCache || options.mockDir) {
+                            fs.exists(options.mockDir + tmp + '.json', function (isExist) {
+                                if (!isExist) {
+                                    fsPath.writeFile(options.mockDir + tmp + '.json', resp.text);
+                                }
+                            });
+                        }
+                    }
+                    else {
                         res.set(resp.headers)
                     }
-                    // res.set({'Content-Type': resp.get('Content-Type')})
                     res.send(resp.text);
-                    if (options.mockCache || options.mockDir) {
-                        fs.exists(options.mockDir + tmp + '.json', function (isExist) {
-                            if (!isExist) {
-                                fsPath.writeFile(options.mockDir + tmp + '.json', resp.text);
-                            }
-                        });
-                    }
                 }
             })
     }    
