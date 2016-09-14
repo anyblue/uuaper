@@ -2,9 +2,6 @@
 
 var fs = require('fs');
 var url = require('url');
-
-// var request = require('superagent');
-// var bodyParser = require('body-parser');
 var birdAuth = require('bird-auth');
 var fsPath = require('fs-path');
 
@@ -34,11 +31,6 @@ var Uuaper = module.exports = function (params) {
         options.server = params.server;
     }
 
-    // if (params.express) {
-    //     params.express.use(bodyParser.json());
-    //     params.express.use(bodyParser.urlencoded({extended: true}));
-    // }
-
     if (params.cookie) {
         if (options.debug) console.log('===== Custom Cookies Mode =====')
         options.custom = true;
@@ -48,17 +40,6 @@ var Uuaper = module.exports = function (params) {
         if (options.debug) console.log('===== Auto Get Cookies Mode =====')
         getCookie();
     }
-
-    // fs.exists('./cookie.data', function (isExist) {
-    //     if (isExist) {
-    //         fs.readFile('./cookie.data', 'utf-8', function (err, data) {
-    //             options.cookie = data;
-    //         });
-    //     }
-    //     else {
-    //         getCookie();
-    //     }
-    // });
 };
 
 Uuaper.prototype.loadData = function (req, res) {
@@ -83,8 +64,6 @@ Uuaper.prototype.startServer = function (params) {
         };
         next();
     });
-    // app.use(bodyParser.json());
-    // app.use(bodyParser.urlencoded({extended: true}));
 
     options.port = params.port || 1337;
     options.staticPath = params.staticPath || __dirname;
@@ -109,7 +88,6 @@ function getCookie(cb) {
         service: options.service
     }, function(cookie) {
         options.cookie = cookie;
-        // fs.writeFile('./cookie.data', cookie);
         cb && cb();
     });
 };
@@ -132,7 +110,7 @@ function proxyData(req, res) {
     var tmp = req.originalUrl.match(/\?/i) ? req.originalUrl.match(/(.+)\?{1}/i)[1] : req.originalUrl;
     
     if (options.debug) console.log(req.originalUrl + ' > ' + options.server + req.originalUrl);
-    
+
     req.headers.cookie = options.cookie || '';
     httpProxy(options.server, {
         forwardPath: function(req) {
@@ -179,79 +157,3 @@ function mockData(req, res) {
         }
     });
 }
-
-
-/* 已废弃 */
-// function getData(req, res) {
-
-//     if (options.debug) console.log(req.originalUrl + ' > ' + options.server + req.originalUrl);
-
-//     // hack cookie
-//     req.headers.cookie = options.cookie
-
-//     if (req.originalUrl.match(/[\w]+[\.](avi|mpeg|3gp|mp3|mp4|wav|jpeg|gif|jpg|png|apk|exe|txt|html|zip|Java|doc|js$|css|ttf|woff|csv|doc|xlsx|rar|7z)/g)) {
-//         var tmp = request(options.server + req.originalUrl)
-//             .set(req.headers)
-//             .on('response', function(resp) {
-//                 if (resp.get('Connection') == 'close') {
-//                     getCookie();
-//                     tmp.write('<script>window.location.reload()</script>');
-//                 }
-//                 else {
-//                     res.set({'Content-Type': resp.get('Content-Type')})
-//                 }
-//             })
-//             .pipe(res)
-//     }
-//     else {
-//         var tmp = req.originalUrl.match(/\?/i) ? req.originalUrl.match(/(.+)\?{1}/i)[1] : req.originalUrl;
-//         request(req.method, options.server + req.originalUrl)
-//             .set(req.headers)
-//             .send(req.body)
-//             .end(function(err, resp) {
-//                 if (err && err.status != 403) {
-//                     res.send({error: 'uuaper get data error', message: err.status});
-//                 }
-//                 else if (!options.custom && resp && (resp.req.path.match('login') || (err && err.status == 403))) {
-//                     getCookie(function() {
-//                         req.headers.cookie = options.cookie
-//                         request(req.method, options.server + req.baseUrl + req.url)
-//                             .set(req.headers)
-//                             .send(req.body)
-//                             .end(function(err, resp) {
-//                                 if (resp.text) {
-//                                     res.set({'Content-Type': resp.get('Content-Type')})
-//                                     if (options.mockCache || options.mockDir) {
-//                                         fs.exists(options.mockDir + tmp + '.json', function (isExist) {
-//                                             if (!isExist) {
-//                                                 fsPath.writeFile(options.mockDir + tmp + '.json', resp.text);
-//                                             }
-//                                         });
-//                                     }
-//                                 }
-//                                 else {
-//                                     res.set(resp.headers)
-//                                 }
-//                                 res.send(resp.text);
-//                             })
-//                     })
-//                 }
-//                 else {
-//                     if (resp.text) {
-//                         res.set({'Content-Type': resp.get('Content-Type')})
-//                         if (options.mockCache || options.mockDir) {
-//                             fs.exists(options.mockDir + tmp + '.json', function (isExist) {
-//                                 if (!isExist) {
-//                                     fsPath.writeFile(options.mockDir + tmp + '.json', resp.text);
-//                                 }
-//                             });
-//                         }
-//                     }
-//                     else {
-//                         res.set(resp.headers)
-//                     }
-//                     res.send(resp.text);
-//                 }
-//             })
-//     }    
-// }
