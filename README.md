@@ -5,7 +5,7 @@
 ![OSX Build][osx-image]
 ![LINUX Build][liunx-image]
 
-The proxy tool based on nodejs.
+Proxy tool for front-end development based on NodeJS.
 
 ## Features
 
