@@ -97,17 +97,11 @@ app.use('/api', uuap.loadData);
 ## History
 
 - [1.3.0] 重构proxy模块，也许是该项目最大的一次重构
-<!-- - [1.2.10] 完善res.headers处理 -->
-<!-- - [1.2.8] 移除res.text空判断 -->
 - [1.2.6] res.headers原封不动返回，来解决流形式响应
 - [1.2.3] 增加cookie参数，如果配置，就不使用默认的uuap自动获取方式
-<!-- - [1.2.0] 增加对静态资源文件的转发支持 -->
-<!-- - [1.1.4] 增加`mockCache`参数，如果为`true`，则每次请求都会进行保存到本地的操作 -->
 - [1.1.0] 增加接口数据mock功能
-<!-- - [1.0.5] `server`参数改成非必须参数，默认取service中的域，但是有些项目比较奇葩，故提供该参数 -->
 - [1.0.x] 重构，使用[bird-auth](https://www.npmjs.com/package/bird-auth)包进行cookie获取，同时优化内置server
 - [0.1.7] 老版本
-
 
 [npm-image]: https://img.shields.io/badge/npm-v1.3.0-blue.svg
 [npm-url]: https://npmjs.org/package/uuaper
