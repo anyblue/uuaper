@@ -1,7 +1,7 @@
 {
   "name": "uuaper",
-  "version": "1.3.0",
-  "description": "baidu uuap auto login",
+  "version": "1.3.1",
+  "description": "Proxy tool based on nodejs for front-end development",
   "main": "index.js",
   "scripts": {
     "test": "node ./test/index.js"

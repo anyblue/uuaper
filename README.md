@@ -5,10 +5,11 @@
 ![OSX Build][osx-image]
 ![LINUX Build][liunx-image]
 
-Proxy tool for front-end development based on NodeJS.
+Proxy tool based on NodeJS for front-end development.
 
-## Features
+## Feature
 
+* 前后端分离，前端会有跨域问题，本工具提供server端proxy :)
 * baidu uuuap/passport 自动登录
 
 ## Install
@@ -24,8 +25,8 @@ Proxy tool for front-end development based on NodeJS.
 ```js
 var uuaper = require('uuaper');
 var uuap = new uuaper({
-    cookie: 'xxx',
-    service: 'http://yyy.baidu.com/'
+    service: 'http://yyy.baidu.com/',
+    cookie: 'xxx' // 也可以是个纯转发，无需配置cookie
 });
 ```
 
@@ -45,9 +46,9 @@ var uuap = new uuaper({
 
 ```js
 uuap.startServer({
-    port: 1337, //server端口，不设置默认为1337
-    staticPath: __dirname, //静态资源路径，必须设置
-    proxyPath: ['/tic', '/pgm'] //proxy路径
+    staticPath: __dirname, // 静态资源路径，必须设置
+    port: 1337, // server端口，不设置默认为1337
+    proxyPath: ['/tic', '/pgm'] // 需要转发的路径，譬如/aaa下面的所有请求都走proxy
 });
 ```
 
@@ -91,7 +92,6 @@ app.use('/api', uuap.loadData);
 *  ~~数据mock~~
 *  ~~mock no cache~~
 *  ~~静态资源文件proxy~~
-*  优化结构
 *  Do more...
 
 ## History
@@ -103,7 +103,7 @@ app.use('/api', uuap.loadData);
 - [1.0.x] 重构，使用[bird-auth](https://www.npmjs.com/package/bird-auth)包进行cookie获取，同时优化内置server
 - [0.1.7] 老版本
 
-[npm-image]: https://img.shields.io/badge/npm-v1.3.0-blue.svg
+[npm-image]: https://img.shields.io/badge/npm-v1.3.1-blue.svg
 [npm-url]: https://npmjs.org/package/uuaper
 [node-image]: https://img.shields.io/badge/node-v0.12.0%2B-yellow.svg
 [osx-image]: https://img.shields.io/badge/OSX-passing-brightgreen.svg

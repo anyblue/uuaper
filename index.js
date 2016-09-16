@@ -12,14 +12,12 @@ var options = {};
 var Uuaper = module.exports = function (params) {
 
     options = {
-        username: params.username,
-        password: params.password,
-        uuapServer: params.uuapServer,
         service: params.service.match(/%3A%2F%2F/ig) ? params.service : encodeURIComponent(params.service),
-        debug: params.debug ? params.debug : false,
-        mock: params.mock ? params.mock : false,
+        debug: params.debug || false,
+        mock: params.mock || false,
         mockDir: params.mockDir,
-        mockCache: params.mockCache ? params.mockCache : false
+        mockCache: params.mockCache || false,
+        headers: params.headers || {}
     }
 
     // 某些项目比较奇葩
@@ -31,23 +29,28 @@ var Uuaper = module.exports = function (params) {
         options.server = params.server;
     }
 
+    console.log(options)
     if (params.cookie) {
         if (options.debug) console.log('===== Custom Cookies Mode =====')
-        options.custom = true;
+        options.onlyProxy = true;
         options.cookie = params.cookie;
     }
     else {
         if (options.debug) console.log('===== Auto Get Cookies Mode =====')
-        getCookie();
+        options.username = params.username;
+        options.password = params.password;
+        options.uuapServer = params.uuapServer;
+        if (!options.username || !options.password || !options.uuapServer) {
+            options.onlyProxy = true;
+        }
+        else {
+            _getCookie();
+        }
     }
 };
 
 Uuaper.prototype.loadData = function (req, res) {
-    if (options.mock) {
-        mockData(req, res);
-        return;
-    }
-    proxyData(req, res);
+    options.mock ? _mockData(req, res) : _proxyData(req, res);
 };
 
 
@@ -80,7 +83,7 @@ Uuaper.prototype.startServer = function (params) {
     });
 };
 
-function getCookie(cb) {
+function _getCookie(cb) {
     var uuap = new birdAuth.uuap({
         username: options.username,
         password: options.password,
@@ -93,7 +96,7 @@ function getCookie(cb) {
 };
 
 function retry(req, res, body) {
-    getCookie(function (cookie) {
+    _getCookie(function (cookie) {
         req.headers.cookie = options.cookie;
         httpProxy(options.server, {
             forwardPath: function(req) {
@@ -106,7 +109,7 @@ function retry(req, res, body) {
     })
 }
 
-function proxyData(req, res) {
+function _proxyData(req, res) {
     var tmp = req.originalUrl.match(/\?/i) ? req.originalUrl.match(/(.+)\?{1}/i)[1] : req.originalUrl;
     
     if (options.debug) console.log(req.originalUrl + ' > ' + options.server + req.originalUrl);
@@ -117,22 +120,24 @@ function proxyData(req, res) {
             return req.originalUrl;
         },
         intercept: function(resp, data, req, res, body, callback) {
-            if (+resp.statusCode === 302) {
-                retry(req, res, body);
-                return;
-            }
-            else if (!req.originalUrl.match(/[\w]+[\.](avi|mpeg|3gp|mp3|mp4|wav|jpeg|gif|jpg|png|apk|exe|txt|html|zip|Java|doc|js|json|css|ttf|woff|csv|doc|xlsx|rar|7z)/g)){
-                var data = data.toString();
-                if (!data) {
+            if (!options.onlyProxy) {
+                if (+resp.statusCode === 302) {
                     retry(req, res, body);
                     return;
                 }
-                if (options.mockCache || options.mockDir) {
-                    fs.exists(options.mockDir + tmp + '.json', function (isExist) {
-                        if (!isExist) {
-                            fsPath.writeFile(options.mockDir + tmp + '.json', data);
-                        }
-                    });
+                else if (!req.originalUrl.match(/[\w]+[\.](avi|mpeg|3gp|mp3|mp4|wav|jpeg|gif|jpg|png|apk|exe|txt|html|zip|Java|doc|js|json|css|ttf|woff|csv|doc|xlsx|rar|7z)/g)){
+                    var data = data.toString();
+                    if (!data) {
+                        retry(req, res, body);
+                        return;
+                    }
+                    if (options.mockCache || options.mockDir) {
+                        fs.exists(options.mockDir + tmp + '.json', function (isExist) {
+                            if (!isExist) {
+                                fsPath.writeFile(options.mockDir + tmp + '.json', data);
+                            }
+                        });
+                    }
                 }
             }
             callback(null, data);
@@ -143,7 +148,7 @@ function proxyData(req, res) {
 }
 
 
-function mockData(req, res) {
+function _mockData(req, res) {
     var tmp = req.originalUrl.match(/\?/i) ? req.originalUrl.match(/(.+)\?{1}/i)[1] : req.originalUrl;
     fs.exists(options.mockDir + tmp + '.json', function (isExist) {
         if (isExist) {
@@ -153,7 +158,7 @@ function mockData(req, res) {
             });
         }
         else {
-            proxyData(req, res);
+            _proxyData(req, res);
         }
     });
 }
