@@ -57,7 +57,8 @@ module.exports = function (host, options) {
                 method: req.method,
                 path: path,
                 bodyContent: bodyContent,
-                params: req.params
+                params: req.params,
+                rejectUnauthorized: false
             }
 
             // bodyContent = reqOpt.bodyContent;

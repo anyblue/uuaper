@@ -2,6 +2,7 @@
 
 var fs = require('fs');
 var url = require('url');
+
 var birdAuth = require('bird-auth');
 var fsPath = require('fs-path');
 
@@ -29,14 +30,15 @@ var Uuaper = module.exports = function (params) {
         options.server = params.server;
     }
 
-    console.log(options)
+    // console.log(options)
     if (params.cookie) {
-        if (options.debug) console.log('===== Custom Cookies Mode =====')
+        if (options.debug) {
+            console.log('===== Custom Cookies Mode =====');
+        }
         options.onlyProxy = true;
         options.cookie = params.cookie;
     }
     else {
-        if (options.debug) console.log('===== Auto Get Cookies Mode =====')
         options.username = params.username;
         options.password = params.password;
         options.uuapServer = params.uuapServer;
@@ -44,6 +46,9 @@ var Uuaper = module.exports = function (params) {
             options.onlyProxy = true;
         }
         else {
+            if (options.debug) {
+                console.log('===== Auto Get Cookies Mode =====');
+            }
             _getCookie();
         }
     }
