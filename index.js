@@ -126,12 +126,15 @@ function _proxyData(req, res) {
         },
         intercept: function(resp, data, req, res, body, callback) {
             if (!options.onlyProxy) {
+
                 if (+resp.statusCode === 302) {
                     retry(req, res, body);
                     return;
                 }
-                else if (!req.originalUrl.match(/[\w]+[\.](avi|mpeg|3gp|mp3|mp4|wav|jpeg|gif|jpg|png|apk|exe|txt|html|zip|Java|doc|js|json|css|ttf|woff|csv|doc|xlsx|rar|7z)/g)){
+                if (!resp.headers['content-type'].match('stream')
+                        && !req.originalUrl.match(/[\w]+[\.](avi|mpeg|3gp|mp3|mp4|wav|jpeg|gif|jpg|png|apk|exe|txt|html|zip|Java|doc|js|json|css|ttf|woff|csv|doc|xlsx|rar|7z)/g)){
                     var data = data.toString();
+                    console.log(!resp.headers['content-type'].match('stream'))
                     if (!data) {
                         retry(req, res, body);
                         return;
