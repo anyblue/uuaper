@@ -130,8 +130,22 @@ function _proxyData(req, res) {
                     retry(req, res, body);
                     return;
                 }
-                if ((!resp.headers['content-type'] || !resp.headers['content-type'].match('stream'))
-                        && !req.originalUrl.match(/[\w]+[\.](avi|mpeg|3gp|mp3|mp4|wav|jpeg|gif|jpg|png|apk|exe|txt|html|zip|Java|doc|js|json|css|ttf|woff|csv|doc|xlsx|rar|7z)/g)){
+                // if ((!resp.headers['content-type'] || !resp.headers['content-type'].match('stream'))
+                //         && !req.originalUrl.match(/[\w]+[\.](avi|mpeg|3gp|mp3|mp4|wav|jpeg|gif|jpg|png|apk|exe|txt|html|zip|Java|doc|js|json|css|ttf|woff|csv|doc|xlsx|rar|7z)/g)){
+                //     var data = data.toString();
+                //     if (!data) {
+                //         retry(req, res, body);
+                //         return;
+                //     }
+                //     if (options.mockCache || options.mockDir) {
+                //         fs.exists(options.mockDir + tmp + '.json', function (isExist) {
+                //             if (!isExist) {
+                //                 fsPath.writeFile(options.mockDir + tmp + '.json', data);
+                //             }
+                //         });
+                //     }
+                // }
+                if (resp.headers['content-type'] && resp.headers['content-type'].match(/(text\/html|application\/json)/g)) {
                     var data = data.toString();
                     if (!data) {
                         retry(req, res, body);
