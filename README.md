@@ -96,6 +96,7 @@ app.use('/api', uuap.loadData);
 
 ## History
 
+- [1.3.2] 增加`content-type`为`stream`判断
 - [1.3.1] `rejectUnauthorized: false`处理https证书问题
 - [1.3.0] 重构proxy模块，也许是该项目最大的一次重构
 - [1.2.6] res.headers原封不动返回，来解决流形式响应
@@ -104,7 +105,7 @@ app.use('/api', uuap.loadData);
 - [1.0.x] 重构，使用[bird-auth](https://www.npmjs.com/package/bird-auth)包进行cookie获取，同时优化内置server
 - [0.1.7] 老版本
 
-[npm-image]: https://img.shields.io/badge/npm-v1.3.1-blue.svg
+[npm-image]: https://img.shields.io/badge/npm-v1.3.2-blue.svg
 [npm-url]: https://npmjs.org/package/uuaper
 [node-image]: https://img.shields.io/badge/node-v0.12.0%2B-yellow.svg
 [osx-image]: https://img.shields.io/badge/OSX-passing-brightgreen.svg
