@@ -22,15 +22,15 @@ module.exports = function (host, options) {
     return function handleProxy(req, res, next) {
         if (!filter(req, res)) return next();
         forwardPathAsync(req, res)
-            .then(function(path) {
+            .then(function (path) {
                 proxyWithResolvedPath(req, res, next, path);
             })
-    }
+    };
 
     function proxyWithResolvedPath(req, res, next, path) {
-
+        // console.log(req)
         parsedHost = parsedHost || parseHost(host, req);
-        
+
         if (req.body) {
             runProxy(null, req.body);
         }
@@ -55,11 +55,13 @@ module.exports = function (host, options) {
                 port: options.port || parsedHost.port,
                 headers: reqHeaders(req, options),
                 method: req.method,
-                path: path,
+                path: (parsedHost.path.charAt(parsedHost.path.length - 1) === '/'
+                    ? parsedHost.path.substring(0, parsedHost.path.length - 1)
+                    : parsedHost.path) + path,
                 bodyContent: bodyContent,
                 params: req.params,
                 rejectUnauthorized: false
-            }
+            };
 
             // bodyContent = reqOpt.bodyContent;
             delete reqOpt.bodyContent;
@@ -81,36 +83,38 @@ module.exports = function (host, options) {
 
             // console.log(reqOpt)
 
-            var realRequest = parsedHost.module.request(reqOpt, function(resp) {
+            var realRequest = parsedHost.module.request(reqOpt, function (resp) {
                 var chunks = [];
-                resp.on('data', function(chunk) {
+                resp.on('data', function (chunk) {
                     chunks.push(chunk);
                 });
 
-                resp.on('end', function() {
+                resp.on('end', function () {
 
                     var respData = Buffer.concat(chunks, chunkLength(chunks));
-                    
+
                     if (intercept) {
-                        intercept(resp, respData, req, res, bodyContent, function(err, respd, sent) {
+                        intercept(resp, respData, req, res, bodyContent, function (err, respd, sent) {
                             if (err) {
                                 return next(err);
                             }
                             // console.log(respData.toString())
                             respd = asBuffer(respd, options);
-
                             if (!Buffer.isBuffer(respd)) {
                                 next(new Error('intercept should return string or buffer as data'));
                             }
 
                             if (!res.headersSent) {
-                                res.set('content-length', respd.length);
+                                res.set('Content-Length', respd.length);
+                                if (!resp.headers['content-type']) {
+                                    res.set('Content-Type', 'application/json; charset=utf-8');
+                                }
                             }
                             else if (respd.length !== respData.length) {
                                 var error = '"Content-Length" is already sent, the length of response data can not be changed';
                                 next(new Error(error));
                             }
-                            
+                            // console.log(res)
                             if (!sent) {
                                 res.send(respd);
                             }
@@ -123,24 +127,27 @@ module.exports = function (host, options) {
                     }
                 });
 
-                resp.on('error', function(e) {
+                resp.on('error', function (e) {
                     next(e);
                 });
 
                 if (!res.headersSent) {
+                    // console.log(resp.headers);
                     res.status(resp.statusCode);
                     Object.keys(resp.headers)
-                        .filter(function(item) {
+                        .filter(function (item) {
                             return item != 'transfer-encoding';
                         })
-                        .forEach(function(item) {
+                        .forEach(function (item) {
                             // .replace(/(\w)/,function(v){return v.toUpperCase()})
-                            res.set(item, resp.headers[item])
+                            res.set(item.replace(/(\w)/, function (v) {
+                                return v.toUpperCase()
+                            }), resp.headers[item])
                         })
                 }
             });
             // console.log(realRequest)
-            realRequest.on('error', function(err) {
+            realRequest.on('error', function (err) {
                 if (err.code === 'ECONNRESET') {
                     res.setHeader('X-Timout-Reason',
                         'Proxyer timed out your request after ' + options.timeout + 'ms.');
@@ -158,7 +165,7 @@ module.exports = function (host, options) {
 
             realRequest.end();
 
-            req.on('aborted', function() {
+            req.on('aborted', function () {
                 realRequest.abort();
             });
         }
@@ -174,8 +181,8 @@ module.exports = function (host, options) {
     }
 
     function defaultForwardPathAsync(forwardPath) {
-        return function(req, res) {
-            return new promise.Promise(function(resolve) {
+        return function (req, res) {
+            return new promise.Promise(function (resolve) {
                 resolve(forwardPath(req, res));
             });
         };
@@ -183,8 +190,8 @@ module.exports = function (host, options) {
 
     function bodyEncoding(options) {
         /*
-            null should be passed forward as the value of reqBodyEncoding,
-            undefined should result in utf-8
+         null should be passed forward as the value of reqBodyEncoding,
+         undefined should result in utf-8
          */
         return options.reqBodyEncoding !== 'undefined' ? options.reqBodyEncoding : 'utf-8';
     }
@@ -259,14 +266,14 @@ module.exports = function (host, options) {
     }
 
     function chunkLength(chunks) {
-        return chunks.reduce(function(len, buf) {
+        return chunks.reduce(function (len, buf) {
             return len + buf.length;
         }, 0);
     }
 
     function parseHost(host, req) {
+        // console.log(arguments)
         host = (typeof host === 'function') ? host(req) : host.toString();
-
         if (!host) {
             return new Error('Empty host parameter');
         }
@@ -286,7 +293,8 @@ module.exports = function (host, options) {
         return {
             host: parsed.hostname,
             port: parsed.port || (ishttps ? 443 : 80),
-            module: ishttps ? https : http,
+            path: parsed.path,
+            module: ishttps ? https : http
         };
     }
 }

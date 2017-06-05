@@ -2,159 +2,144 @@
 
 var fs = require('fs');
 var url = require('url');
+var path = require('path');
 
 var birdAuth = require('bird-auth');
 var fsPath = require('fs-path');
 
 var httpProxy = require('./libs/proxy');
 
-var options = {};
+var CONSOLE_COLOR_YELLOW = '\x1b[33m%s\x1b[0m';
+var CONSOLE_COLOR_GREEN = '\x1b[34m%s\x1b[0m';
 
-var Uuaper = module.exports = function (params) {
+var Uuaper = function (params) {
 
-    options = {
-        service: params.service.match(/%3A%2F%2F/ig) ? params.service : encodeURIComponent(params.service),
+    if (!params) throw new Error('Where you params?');
+
+    if (params.service) {
+        throw new Error('Uuaper 2.x version is not support 1.x settings, you can `npm install uuaper@1.3.4 --save`.');
+    }
+
+    if (params.cache && typeof params.cache !== 'string') {
+        throw new Error('the cache setting must be a path string.');
+    }
+
+    this._options = {
+        target: params.target,
         debug: params.debug || false,
-        mock: params.mock || false,
-        mockDir: params.mockDir,
-        mockCache: params.mockCache || false,
-        headers: params.headers || {}
-    }
+        headers: params.headers || {},
+        mock: params.mock,
+        cache: params.cache,
+        auth: params.auth,
+        server: params.server
+    };
 
-    // 某些项目比较奇葩
-    if (!params.server) {
-        var tmp  = url.parse(decodeURIComponent(params.service));
-        options.server = tmp.protocol + '//' + tmp.hostname + (~~tmp.port ? ':' + tmp.port : '');
-    }
-    else {
-        options.server = params.server;
-    }
-
-    // console.log(options)
-    if (params.cookie) {
-        if (options.debug) {
-            console.log('===== Custom Cookies Mode =====');
-        }
-        options.onlyProxy = true;
-        options.cookie = params.cookie;
+    if (params.auth) {
+        if (params.debug) console.log(CONSOLE_COLOR_YELLOW, '===== Auto Get Cookies Mode =====\n');
+        this.onlyProxy = false;
+        this.getCookie();
     }
     else {
-        options.username = params.username;
-        options.password = params.password;
-        options.uuapServer = params.uuapServer;
-        if (!options.username || !options.password || !options.uuapServer) {
-            options.onlyProxy = true;
+        this.onlyProxy = true;
+    }
+
+    var self = this;
+    if (params.server) {
+        var express = require('express');
+        var app = this.app = express();
+
+        app.use(function (req, res, next) {
+            var exec_start_at = Date.now();
+            var _send = res.send;
+            res.send = function () {
+                res.set('X-Execution-Time', String(Date.now() - exec_start_at));
+                return _send.apply(res, arguments);
+            };
+            next();
+        });
+
+        for (var i = 0; i < params.server.proxyPath.length; i++) {
+            app.use(params.server.proxyPath[i], function (req, res) {
+                self.proxyData(req, res);
+            });
         }
-        else {
-            if (options.debug) {
-                console.log('===== Auto Get Cookies Mode =====');
-            }
-            _getCookie();
+
+        app.use(express.static(params.server.staticPath || __dirname));
+
+        app.listen(params.server.port || 1337, function () {
+            console.log('Server listening on http://localhost:' + params.server.port + ', Ctrl+C to stop')
+        });
+        return this;
+    }
+    else {
+        return function (req, res) {
+            self._options.mock ? self.mockData(req, res) : self.proxyData(req, res);
         }
     }
 };
 
-Uuaper.prototype.loadData = function (req, res) {
-    options.mock ? _mockData(req, res) : _proxyData(req, res);
-};
-
-
-Uuaper.prototype.startServer = function (params) {
-    var express = require('express');
-    var app = express();
-
-    app.use(function (req, res, next) {
-        var exec_start_at = Date.now();
-        var _send = res.send;
-        res.send = function () {
-            res.set('X-Execution-Time', String(Date.now() - exec_start_at));
-            return _send.apply(res, arguments);
-        };
-        next();
-    });
-
-    options.port = params.port || 1337;
-    options.staticPath = params.staticPath || __dirname;
-    options.proxyPath = params.proxyPath || [];
-
-    for (var i = 0; i < options.proxyPath.length; i++) {
-        app.use(options.proxyPath[i], this.loadData);
-    }
-
-    app.use(express.static(options.staticPath));
-
-    app.listen(options.port, function () {
-        console.log('Server listening on http://localhost:' + options.port + ', Ctrl+C to stop')
-    });
-};
-
-function _getCookie(cb) {
-    var uuap = new birdAuth.uuap({
-        username: options.username,
-        password: options.password,
-        uuapServer: options.uuapServer,
-        service: options.service
-    }, function(cookie) {
-        options.cookie = cookie;
+Uuaper.prototype.getCookie = function (cb) {
+    var uuap = new birdAuth.uuap(this._options.auth, function (cookie) {
+        this._options.cookie = cookie;
         cb && cb();
     });
+    return uuap;
 };
 
-function retry(req, res, body) {
-    _getCookie(function (cookie) {
+Uuaper.prototype.retry = function (req, res, body) {
+    var self = this;
+    this.getCookie(function (cookie) {
+        var options = self._options;
         req.headers.cookie = options.cookie;
-        httpProxy(options.server, {
-            forwardPath: function(req) {
+        httpProxy(options.target, {
+            forwardPath: function (req) {
                 return req.originalUrl;
             },
             defaultBody: body
-        })(req, res, function(e) {
+        })(req, res, function (e) {
             console.log(e)
         });
     })
-}
+};
 
-function _proxyData(req, res) {
+Uuaper.prototype.proxyData = function (req, res) {
+    var self = this;
+    var options = self._options;
     var tmp = req.originalUrl.match(/\?/i) ? req.originalUrl.match(/(.+)\?{1}/i)[1] : req.originalUrl;
-    
-    if (options.debug) console.log(req.originalUrl + ' > ' + options.server + req.originalUrl);
 
-    req.headers.cookie = options.cookie || '';
-    httpProxy(options.server, {
-        forwardPath: function(req) {
+    if (options.debug) {
+        console.log(CONSOLE_COLOR_GREEN, req.originalUrl + ' > ' + options.target + req.originalUrl);
+    }
+    req.headers.cookie = options.auth.cookie || '';
+    if (options.headers) {
+        for (var item in options.headers) {
+            req.headers.item = options.headers[item];
+        }
+    }
+    httpProxy(options.target, {
+        headers: options.headers,
+        forwardPath: function (req) {
             return req.originalUrl;
         },
-        intercept: function(resp, data, req, res, body, callback) {
+        intercept: function (resp, data, req, res, body, callback) {
             if (!options.onlyProxy) {
-                if (+resp.statusCode === 302) {
-                    retry(req, res, body);
+                if (+resp.statusCode === 302
+                    || (options.auth.retry && options.auth.retry(resp, data.toString()))) {
+                    self.retry(req, res, body);
                     return;
                 }
-                // if ((!resp.headers['content-type'] || !resp.headers['content-type'].match('stream'))
-                //         && !req.originalUrl.match(/[\w]+[\.](avi|mpeg|3gp|mp3|mp4|wav|jpeg|gif|jpg|png|apk|exe|txt|html|zip|Java|doc|js|json|css|ttf|woff|csv|doc|xlsx|rar|7z)/g)){
-                //     var data = data.toString();
-                //     if (!data) {
-                //         retry(req, res, body);
-                //         return;
-                //     }
-                //     if (options.mockCache || options.mockDir) {
-                //         fs.exists(options.mockDir + tmp + '.json', function (isExist) {
-                //             if (!isExist) {
-                //                 fsPath.writeFile(options.mockDir + tmp + '.json', data);
-                //             }
-                //         });
-                //     }
-                // }
-                if (resp.headers['content-type'] && resp.headers['content-type'].match(/(text\/html|application\/json)/g)) {
+                if (resp.headers['content-type']
+                    && resp.headers['content-type'].match(/(text\/html|application\/json)/g)) {
                     var data = data.toString();
                     if (!data) {
-                        retry(req, res, body);
+                        self.retry(req, res, body);
                         return;
                     }
-                    if (options.mockCache || options.mockDir) {
-                        fs.exists(options.mockDir + tmp + '.json', function (isExist) {
+                    if (options.cache && resp.headers['content-type'].match(/json/g)) {
+                        var filePath = path.join(options.cache, tmp + '.json');
+                        fs.exists(filePath, function (isExist) {
                             if (!isExist) {
-                                fsPath.writeFile(options.mockDir + tmp + '.json', data);
+                                fsPath.writeFile(filePath, data);
                             }
                         });
                     }
@@ -162,23 +147,32 @@ function _proxyData(req, res) {
             }
             callback(null, data);
         }
-    })(req, res, function(e) {
+    })(req, res, function (e) {
         console.log(e)
     });
-}
+};
 
-
-function _mockData(req, res) {
-    var tmp = req.originalUrl.match(/\?/i) ? req.originalUrl.match(/(.+)\?{1}/i)[1] : req.originalUrl;
-    fs.exists(options.mockDir + tmp + '.json', function (isExist) {
+Uuaper.prototype.mockData = function (req, res) {
+    var options = this._options;
+    var tmp = req.originalUrl.match(/\?/i)
+        ? req.originalUrl.match(/(.+)\?{1}/i)[1]
+        : req.originalUrl;
+    var filePath = path.join(options.cache, tmp + '.json');
+    var self = this;
+    fs.exists(filePath, function (isExist) {
         if (isExist) {
-            fs.readFile(options.mockDir + tmp + '.json', 'utf-8', function (err, data) {
-                if (options.debug) console.log(tmp + ' > ' + options.mockDir + tmp + '.json')
+            fs.readFile(filePath, 'utf-8', function (err, data) {
+                if (options.debug) {
+                    console.log(CONSOLE_COLOR_YELLOW, tmp + ' > ' + filePath);
+                }
+                res.set('X-Uuaper-Type', 'mock');
                 res.send(data);
             });
         }
         else {
-            _proxyData(req, res);
+            self.proxyData(req, res);
         }
     });
-}
+};
+
+module.exports = Uuaper;
