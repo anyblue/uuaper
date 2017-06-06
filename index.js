@@ -9,8 +9,8 @@ var fsPath = require('fs-path');
 
 var httpProxy = require('./libs/proxy');
 
-var CONSOLE_COLOR_YELLOW = '\x1b[33m%s\x1b[0m';
-var CONSOLE_COLOR_GREEN = '\x1b[34m%s\x1b[0m';
+var CONSOLE_COLOR_YELLOW = '\x1b[34m%s\x1b[0m';
+var CONSOLE_COLOR_GREEN = '\x1b[33m%s\x1b[0m';
 
 var Uuaper = function (params) {
 
@@ -79,8 +79,9 @@ var Uuaper = function (params) {
 };
 
 Uuaper.prototype.getCookie = function (cb) {
-    var uuap = new birdAuth.uuap(this._options.auth, function (cookie) {
-        this._options.cookie = cookie;
+    var self = this;
+    var uuap = new birdAuth.uuap(self._options.auth, function (cookie) {
+        self._options.cookie = cookie;
         cb && cb();
     });
     return uuap;
@@ -88,9 +89,10 @@ Uuaper.prototype.getCookie = function (cb) {
 
 Uuaper.prototype.retry = function (req, res, body) {
     var self = this;
-    this.getCookie(function (cookie) {
+    this.getCookie(function () {
         var options = self._options;
         req.headers.cookie = options.cookie;
+        res.set('X-Uuaper-Retry', true);
         httpProxy(options.target, {
             forwardPath: function (req) {
                 return req.originalUrl;
@@ -110,7 +112,7 @@ Uuaper.prototype.proxyData = function (req, res) {
     if (options.debug) {
         console.log(CONSOLE_COLOR_GREEN, req.originalUrl + ' > ' + options.target + req.originalUrl);
     }
-    req.headers.cookie = options.auth.cookie || '';
+    req.headers.cookie = options.cookie || '';
     if (options.headers) {
         for (var item in options.headers) {
             req.headers.item = options.headers[item];
@@ -147,9 +149,7 @@ Uuaper.prototype.proxyData = function (req, res) {
             }
             callback(null, data);
         }
-    })(req, res, function (e) {
-        console.log(e)
-    });
+    })(req, res);
 };
 
 Uuaper.prototype.mockData = function (req, res) {

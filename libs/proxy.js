@@ -47,7 +47,7 @@ module.exports = function (host, options) {
         }
 
         function runProxy(err, bodyContent) {
-
+            var exec_start_at = Date.now();
             // console.log(bodyContent)
 
             var reqOpt = {
@@ -82,7 +82,6 @@ module.exports = function (host, options) {
             }
 
             // console.log(reqOpt)
-
             var realRequest = parsedHost.module.request(reqOpt, function (resp) {
                 var chunks = [];
                 resp.on('data', function (chunk) {
@@ -106,6 +105,7 @@ module.exports = function (host, options) {
 
                             if (!res.headersSent) {
                                 res.set('Content-Length', respd.length);
+                                res.set('X-Execution-Time', String(Date.now() - exec_start_at));
                                 if (!resp.headers['content-type']) {
                                     res.set('Content-Type', 'application/json; charset=utf-8');
                                 }
