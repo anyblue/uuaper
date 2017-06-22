@@ -1,6 +1,6 @@
 {
   "name": "uuaper",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "Proxy tool based on nodejs for front-end development",
   "main": "index.js",
   "scripts": {
