@@ -216,14 +216,14 @@ module.exports = function (host, options) {
         if (!source) {
             return obj;
         }
-
+        var tmpObj = JSON.parse(JSON.stringify(obj));
         for (var prop in source) {
             if (!skips || skips.indexOf(prop) === -1) {
-                obj[prop] = source[prop];
+                tmpObj[prop] = source[prop];
             }
         }
 
-        return obj;
+        return tmpObj;
     }
 
     function asBuffer(body, options) {

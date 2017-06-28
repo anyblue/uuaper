@@ -95,6 +95,12 @@ var uuap = new uuaper({
         username: 'xxx',
         password: 'xxx',
         server: 'https://passport.qatest.baidu.com/', //default passport.baidu.com
+        forwardCookie: function (cb) {
+            // use `uuaper.client` do something to get extrenal cookie
+            uuaper.client.get('xxx.baidu.com', function () {
+                cb && cb(uuaper.client.get_cookies_string());
+            });
+        }
     }
 });
 ```
@@ -125,7 +131,7 @@ var uuap = new uuaper({
 
 ## History
 
-- [2.0.4] 增加baidu.passport支持
+- [2.0.5] 增加baidu.passport支持 & headers bugfix
 - [2.0.0] 配置项优化
 - [1.3.4] `content-type`处理优化
 - [1.3.3] 增加`content-type`为`stream`判断
@@ -137,7 +143,7 @@ var uuap = new uuaper({
 - [1.0.x] 重构，使用[bird-auth](https://www.npmjs.com/package/bird-auth)包进行cookie获取，同时优化内置server
 - [0.1.7] 老版本
 
-[npm-image]: https://img.shields.io/badge/npm-v2.0.4-blue.svg
+[npm-image]: https://img.shields.io/badge/npm-v2.0.5-blue.svg
 [npm-url]: https://npmjs.org/package/uuaper
 [node-image]: https://img.shields.io/badge/node-v0.12.0%2B-yellow.svg
 [osx-image]: https://img.shields.io/badge/OSX-passing-brightgreen.svg

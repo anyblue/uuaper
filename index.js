@@ -81,11 +81,22 @@ var Uuaper = function (params) {
 Uuaper.prototype.getCookie = function (cb) {
     var self = this;
     return new birdAuth[self._options.auth.type || 'uuap'](self._options.auth, function (cookie) {
-        if (self._options.debug) {
-            console.log(CONSOLE_COLOR_GREEN, 'Cookie: =======> ', cookie);
+        if (self._options.auth && self._options.auth.forwardCookie) {
+            self._options.auth.forwardCookie(function (newCookie) {
+                self._options.cookie = newCookie;
+                if (self._options.debug) {
+                    console.log(CONSOLE_COLOR_GREEN, 'New Cookie: =======> ', newCookie);
+                }
+                cb && cb();
+            });
         }
-        self._options.cookie = cookie;
-        cb && cb();
+        else {
+            self._options.cookie = cookie;
+            if (self._options.debug) {
+                console.log(CONSOLE_COLOR_GREEN, 'Cookie: =======> ', cookie);
+            }
+            cb && cb();
+        }
     });
 };
 
@@ -93,8 +104,9 @@ Uuaper.prototype.retry = function (req, res, body) {
     var self = this;
     this.getCookie(function () {
         var options = self._options;
-        req.headers.cookie = options.cookie;
-        res.set('X-Uuaper-Retry', true);
+        if (!res.headersSent) {
+            req.headers.cookie = options.cookie;
+        }
         httpProxy(options.target, {
             forwardPath: function (req) {
                 return req.originalUrl;
@@ -117,7 +129,7 @@ Uuaper.prototype.proxyData = function (req, res, next) {
     req.headers.cookie = options.cookie || '';
     if (options.headers) {
         for (var item in options.headers) {
-            req.headers.item = options.headers[item];
+            req.headers[item] = options.headers[item];
         }
     }
     httpProxy(options.target, {
@@ -127,8 +139,7 @@ Uuaper.prototype.proxyData = function (req, res, next) {
         },
         intercept: function (resp, data, req, res, body, callback) {
             if (!options.onlyProxy) {
-                if (+resp.statusCode === 302
-                    || (options.auth.retry && options.auth.retry(resp, data && data.toString()))) {
+                if ((options.auth && options.auth.retry && options.auth.retry(resp, data && data.toString()))) {
                     self.retry(req, res, body);
                     return;
                 }
@@ -176,5 +187,7 @@ Uuaper.prototype.mockData = function (req, res, next) {
         }
     });
 };
+
+Uuaper.client = birdAuth.client;
 
 module.exports = Uuaper;
