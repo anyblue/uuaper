@@ -84,6 +84,21 @@ var uuap = new uuaper({
 });
 ```
 
+#### baidu passport 自动认证
+
+```javascript
+var uuaper = require('uuaper');
+var uuap = new uuaper({
+    target: 'http://xxx.xxx.com/',
+    auth: {
+        type: 'passport',
+        username: 'xxx',
+        password: 'xxx',
+        server: 'https://passport.qatest.baidu.com/', //default passport.baidu.com
+    }
+});
+```
+
 <!--## 配置项-->
 
 <!--- **service** (必需配置，目标server，或者登出你们的系统，然后取url中service参数)-->
@@ -110,6 +125,7 @@ var uuap = new uuaper({
 
 ## History
 
+- [2.0.4] 增加baidu.passport支持
 - [2.0.0] 配置项优化
 - [1.3.4] `content-type`处理优化
 - [1.3.3] 增加`content-type`为`stream`判断
@@ -121,7 +137,7 @@ var uuap = new uuaper({
 - [1.0.x] 重构，使用[bird-auth](https://www.npmjs.com/package/bird-auth)包进行cookie获取，同时优化内置server
 - [0.1.7] 老版本
 
-[npm-image]: https://img.shields.io/badge/npm-v2.0.3-blue.svg
+[npm-image]: https://img.shields.io/badge/npm-v2.0.4-blue.svg
 [npm-url]: https://npmjs.org/package/uuaper
 [node-image]: https://img.shields.io/badge/node-v0.12.0%2B-yellow.svg
 [osx-image]: https://img.shields.io/badge/OSX-passing-brightgreen.svg

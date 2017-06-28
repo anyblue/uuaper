@@ -80,11 +80,13 @@ var Uuaper = function (params) {
 
 Uuaper.prototype.getCookie = function (cb) {
     var self = this;
-    var uuap = new birdAuth.uuap(self._options.auth, function (cookie) {
+    return new birdAuth[self._options.auth.type || 'uuap'](self._options.auth, function (cookie) {
+        if (self._options.debug) {
+            console.log(CONSOLE_COLOR_GREEN, 'Cookie: =======> ', cookie);
+        }
         self._options.cookie = cookie;
         cb && cb();
     });
-    return uuap;
 };
 
 Uuaper.prototype.retry = function (req, res, body) {
