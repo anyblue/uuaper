@@ -78,26 +78,47 @@ var Uuaper = function (params) {
     }
 };
 
-Uuaper.prototype.getCookie = function (cb) {
-    var self = this;
-    return new birdAuth[self._options.auth.type || 'uuap'](self._options.auth, function (cookie) {
-        if (self._options.auth && self._options.auth.forwardCookie) {
-            self._options.auth.forwardCookie(function (newCookie) {
-                self._options.cookie = newCookie;
-                if (self._options.debug) {
-                    console.log(CONSOLE_COLOR_GREEN, 'New Cookie: =======> ', newCookie);
-                }
-                cb && cb();
-            });
-        }
-        else {
-            self._options.cookie = cookie;
-            if (self._options.debug) {
-                console.log(CONSOLE_COLOR_GREEN, 'Cookie: =======> ', cookie);
+Uuaper.client = birdAuth.client;
+
+function dealCookie(options, cookie, cb) {
+    Uuaper.client.clear_cookies();
+    if (options.auth.forwardCookie) {
+        Uuaper.client.set_cookies(cookie);
+        options.auth.forwardCookie(function (newCookie) {
+            if (!newCookie) {
+                throw new Error('where you new auth cookies ?');
+            }
+            options.cookie = newCookie;
+            if (options.debug) {
+                console.log(CONSOLE_COLOR_GREEN, 'New Cookie: =======> ', options.cookie);
             }
             cb && cb();
+        });
+    }
+    else {
+        options.cookie = cookie;
+        if (options.debug) {
+            console.log(CONSOLE_COLOR_GREEN, 'Cookie: =======> ', options.cookie);
         }
-    });
+        cb && cb();
+    }
+}
+
+Uuaper.prototype.getCookie = function (cb) {
+    var self = this;
+    if (self._options.auth.getAuth) {
+        self._options.auth.getAuth(function (cookie) {
+            if (!cookie) {
+                throw new Error('where you auth cookies ?');
+            }
+            dealCookie(self._options, cookie, cb);
+        });
+    }
+    else {
+        new birdAuth[self._options.auth.type || 'uuap'](self._options.auth, function (cookie) {
+            dealCookie(self._options, cookie, cb);
+        });
+    }
 };
 
 Uuaper.prototype.retry = function (req, res, body) {
@@ -147,7 +168,7 @@ Uuaper.prototype.proxyData = function (req, res, next) {
                     && resp.headers['content-type'].match(/(text\/html|application\/json)/g)) {
                     var data = data.toString();
                     if (!data) {
-                        self.retry(req, res, body);
+                        options.auth && self.retry(req, res, body);
                         return;
                     }
                     if (options.cache && resp.headers['content-type'].match(/json/g)) {
@@ -187,7 +208,5 @@ Uuaper.prototype.mockData = function (req, res, next) {
         }
     });
 };
-
-Uuaper.client = birdAuth.client;
 
 module.exports = Uuaper;
