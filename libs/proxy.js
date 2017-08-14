@@ -14,7 +14,7 @@ module.exports = function (host, options) {
 
     var body = options.defaultBody;
     var intercept = options.intercept;
-    var limit = options.limit || '1mb';
+    var limit = options.limit || '10mb';
     var filter = options.filter || defaultFilter;
     var forwardPath = options.forwardPath || defaultForwardPath;
     var forwardPathAsync = options.forwardPathAsync || defaultForwardPathAsync(forwardPath);

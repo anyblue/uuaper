@@ -31,7 +31,8 @@ var Uuaper = function (params) {
         mock: params.mock,
         cache: params.cache,
         auth: params.auth,
-        server: params.server
+        server: params.server,
+        limit: params.limit
     };
 
     if (params.auth) {
@@ -154,6 +155,7 @@ Uuaper.prototype.proxyData = function (req, res, next) {
         }
     }
     httpProxy(options.target, {
+        limit: options.limit || '10mb',
         headers: options.headers,
         forwardPath: function (req) {
             return req.originalUrl;
