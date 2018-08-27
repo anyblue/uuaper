@@ -47,7 +47,7 @@ Proxy tool based on NodeJS for front-end development.
 var uuaper = require('uuaper');
 var uuap = new uuaper({
     target: 'http://xxx.xxx.com/',
-    header: {
+    headers: {
         cookie: 'xxx'
     },
     debug: true,
