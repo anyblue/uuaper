@@ -177,7 +177,11 @@ Uuaper.prototype.proxyData = function (req, res, next) {
                         var filePath = path.join(options.cache, tmp + '.json');
                         fs.exists(filePath, function (isExist) {
                             if (!isExist) {
-                                fsPath.writeFile(filePath, data);
+                                fsPath.writeFile(filePath, data, function (error) {
+                                    if (error) {
+                                        console.error(error);
+                                    }
+                                });
                             }
                         });
                     }
