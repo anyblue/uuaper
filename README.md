@@ -86,6 +86,7 @@ var uuap = new uuaper({
         username: 'xxx',
         password: 'xxx',
         server: 'http://xxx.baidu.com/login?',
+        rsa: 'xxx',
         retry: function(res, data) {
             return +res.statusCode === 403;
         }
@@ -140,6 +141,8 @@ var uuap = new uuaper({
 
 ## History
 
+- [2.0.9] update bird-auth.
+- [2.0.8] fix fsPath.writeFile error
 - [2.0.7] add request body size `limit` setting
 - [2.0.6] 支持自定义 `auth logic`
 - [2.0.5] 增加baidu.passport支持 & headers bugfix
@@ -154,7 +157,7 @@ var uuap = new uuaper({
 - [1.0.x] 重构，使用[bird-auth](https://www.npmjs.com/package/bird-auth)包进行cookie获取，同时优化内置server
 - [0.1.7] 老版本
 
-[npm-image]: https://img.shields.io/badge/npm-v2.0.7-blue.svg
+[npm-image]: https://img.shields.io/badge/npm-v2.0.9-blue.svg
 [npm-url]: https://npmjs.org/package/uuaper
 [node-image]: https://img.shields.io/badge/node-v0.12.0%2B-yellow.svg
 [osx-image]: https://img.shields.io/badge/OSX-passing-brightgreen.svg
