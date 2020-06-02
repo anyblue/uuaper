@@ -3,3 +3,6 @@ cookie.data
 test/
 mock/
 .idea
+
+package-lock.json
+yarn.lock
