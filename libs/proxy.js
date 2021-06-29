@@ -1,26 +1,27 @@
 'use strict';
 
-var url = require('url');
-var http = require('http');
-var https = require('https');
-var getRawBody = require('raw-body');
-var promise = require('es6-promise');
+const url = require('url');
+const http = require('http');
+const https = require('https');
+const getRawBody = require('raw-body');
+const promise = require('es6-promise'); // TODO 是否还有必要？
 
 module.exports = function (host, options) {
-
     options = options || {};
 
-    var parsedHost;
+    let parsedHost;
 
-    var body = options.defaultBody;
-    var intercept = options.intercept;
-    var limit = options.limit || '10mb';
-    var filter = options.filter || defaultFilter;
-    var forwardPath = options.forwardPath || defaultForwardPath;
-    var forwardPathAsync = options.forwardPathAsync || defaultForwardPathAsync(forwardPath);
+    const body = options.defaultBody;
+    const intercept = options.intercept;
+    const limit = options.limit || '10mb';
+    const filter = options.filter || defaultFilter;
+    const forwardPath = options.forwardPath || defaultForwardPath;
+    const forwardPathAsync = options.forwardPathAsync || defaultForwardPathAsync(forwardPath);
 
     return function handleProxy(req, res, next) {
-        if (!filter(req, res)) return next();
+        if (!filter(req, res)) {
+            return next();
+        }
         forwardPathAsync(req, res)
             .then(function (path) {
                 proxyWithResolvedPath(req, res, next, path);
@@ -33,24 +34,22 @@ module.exports = function (host, options) {
 
         if (req.body) {
             runProxy(null, req.body);
-        }
-        else if (body) {
+        } else if (body) {
             runProxy(null, body);
-        }
-        else {
+        } else {
             // 二次触发解析失败，原因位置，暂时用body-parse
             getRawBody(req, {
                 length: req.headers['content-length'],
-                limit: limit,
+                limit,
                 encoding: bodyEncoding(options)
             }, runProxy);
         }
 
         function runProxy(err, bodyContent) {
-            var exec_start_at = Date.now();
             // console.log(bodyContent)
+            const exec_start_at = Date.now();
 
-            var reqOpt = {
+            const reqOpt = {
                 hostname: parsedHost.host,
                 port: options.port || parsedHost.port,
                 headers: reqHeaders(req, options),
@@ -82,15 +81,14 @@ module.exports = function (host, options) {
             }
 
             // console.log(reqOpt)
-            var realRequest = parsedHost.module.request(reqOpt, function (resp) {
-                var chunks = [];
+            const realRequest = parsedHost.module.request(reqOpt, function (resp) {
+                const chunks = [];
                 resp.on('data', function (chunk) {
                     chunks.push(chunk);
                 });
 
                 resp.on('end', function () {
-
-                    var respData = Buffer.concat(chunks, chunkLength(chunks));
+                    const respData = Buffer.concat(chunks, chunkLength(chunks));
 
                     if (intercept) {
                         intercept(resp, respData, req, res, bodyContent, function (err, respd, sent) {
@@ -109,9 +107,8 @@ module.exports = function (host, options) {
                                 if (!resp.headers['content-type']) {
                                     res.set('Content-Type', 'application/json; charset=utf-8');
                                 }
-                            }
-                            else if (respd.length !== respData.length) {
-                                var error = '"Content-Length" is already sent, the length of response data can not be changed';
+                            } else if (respd.length !== respData.length) {
+                                const error = '"Content-Length" is already sent, the length of response data can not be changed';
                                 next(new Error(error));
                             }
                             // console.log(res)
@@ -119,8 +116,7 @@ module.exports = function (host, options) {
                                 res.send(respd);
                             }
                         })
-                    }
-                    else {
+                    } else {
                         if (!res.headersSent) {
                             res.send(respData);
                         }
@@ -153,8 +149,7 @@ module.exports = function (host, options) {
                         'Proxyer timed out your request after ' + options.timeout + 'ms.');
                     res.writeHeader(504, {'Content-Type': 'text/plain'});
                     res.end();
-                }
-                else {
+                } else {
                     next(err);
                 }
             });
@@ -177,7 +172,7 @@ module.exports = function (host, options) {
     }
 
     function defaultForwardPath(req) {
-        return url.parse(req.url).path;
+        return url.parse(req.url).path; // TODO remove deprecated api.
     }
 
     function defaultForwardPathAsync(forwardPath) {
@@ -190,22 +185,21 @@ module.exports = function (host, options) {
 
     function bodyEncoding(options) {
         /*
-         null should be passed forward as the value of reqBodyEncoding,
-         undefined should result in utf-8
+         * null should be passed forward as the value of reqBodyEncoding,
+         * undefined should result in utf-8
          */
         return options.reqBodyEncoding !== 'undefined' ? options.reqBodyEncoding : 'utf-8';
     }
 
     function reqHeaders(req, options) {
-        var headers = options.headers || {};
-
-        var skipHdrs = ['connection', 'content-length', 'accept-encoding'];
+        const headers = options.headers || {};
+        const skipHdrs = ['connection', 'content-length', 'accept-encoding'];
 
         if (!options.preserveHostHdr) {
             skipHdrs.push('host');
         }
 
-        var hds = extend(headers, req.headers, skipHdrs);
+        const hds = extend(headers, req.headers, skipHdrs);
         hds.connection = 'close';
         // hds['accept-encoding']
         // console.log(hds)
@@ -216,8 +210,8 @@ module.exports = function (host, options) {
         if (!source) {
             return obj;
         }
-        var tmpObj = JSON.parse(JSON.stringify(obj));
-        for (var prop in source) {
+        const tmpObj = JSON.parse(JSON.stringify(obj));
+        for (let prop in source) {
             if (!skips || skips.indexOf(prop) === -1) {
                 tmpObj[prop] = source[prop];
             }
@@ -227,39 +221,34 @@ module.exports = function (host, options) {
     }
 
     function asBuffer(body, options) {
-        var ret;
+        let ret;
         if (Buffer.isBuffer(body)) {
             ret = body;
-        }
-        else if (typeof body === 'object') {
-            ret = new Buffer(JSON.stringify(body), bodyEncoding(options));
-        }
-        else if (typeof body === 'string') {
+        } else if (typeof body === 'object') {
+            ret = new Buffer(JSON.stringify(body), bodyEncoding(options)); // TODO remove deprecated api.
+        } else if (typeof body === 'string') {
             ret = new Buffer(body, bodyEncoding(options));
         }
         return ret;
     }
 
     function asBufferOrString(body) {
-        var ret;
+        let ret;
         if (Buffer.isBuffer(body)) {
             ret = body;
-        }
-        else if (typeof body === 'object') {
+        } else if (typeof body === 'object') {
             ret = JSON.stringify(body);
-        }
-        else if (typeof body === 'string') {
+        } else if (typeof body === 'string') {
             ret = body;
         }
         return ret;
     }
 
     function getContentLength(body) {
-        var result;
+        let result;
         if (Buffer.isBuffer(body)) {
             result = body.length;
-        }
-        else if (typeof body === 'string') {
+        } else if (typeof body === 'string') {
             result = Buffer.byteLength(body);
         }
         return result;
@@ -282,13 +271,13 @@ module.exports = function (host, options) {
             host = 'http://' + host;
         }
 
-        var parsed = url.parse(host);
+        const parsed = url.parse(host);
 
         if (!parsed.hostname) {
             return new Error('Unable to parse hostname, possibly missing protocol://?');
         }
 
-        var ishttps = parsed.protocol === 'https:';
+        const ishttps = parsed.protocol === 'https:';
 
         return {
             host: parsed.hostname,
