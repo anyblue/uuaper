@@ -1,19 +1,15 @@
 'use strict';
 
-var fs = require('fs');
-var url = require('url');
-var path = require('path');
+const fs = require('fs');
+const path = require('path');
+const birdAuth = require('bird-auth');
+const fsPath = require('fs-path');
+const httpProxy = require('./libs/proxy');
 
-var birdAuth = require('bird-auth');
-var fsPath = require('fs-path');
+const CONSOLE_COLOR_YELLOW = '\x1b[34m%s\x1b[0m';
+const CONSOLE_COLOR_GREEN = '\x1b[33m%s\x1b[0m';
 
-var httpProxy = require('./libs/proxy');
-
-var CONSOLE_COLOR_YELLOW = '\x1b[34m%s\x1b[0m';
-var CONSOLE_COLOR_GREEN = '\x1b[33m%s\x1b[0m';
-
-var Uuaper = function (params) {
-
+const Uuaper = function (params) {
     if (!params) throw new Error('Where you params?');
 
     if (params.service) {
@@ -36,22 +32,23 @@ var Uuaper = function (params) {
     };
 
     if (params.auth) {
-        if (params.debug) console.log(CONSOLE_COLOR_YELLOW, '===== Auto Get Cookies Mode =====\n');
+        if (params.debug) {
+            console.log(CONSOLE_COLOR_YELLOW, '===== Auto Get Cookies Mode =====\n');
+        }
         this.onlyProxy = false;
         this.getCookie();
-    }
-    else {
+    } else {
         this.onlyProxy = true;
     }
 
-    var self = this;
+    const self = this;
     if (params.server) {
-        var express = require('express');
-        var app = this.app = express();
+        const express = require('express');
+        const app = this.app = express();
 
         app.use(function (req, res, next) {
-            var exec_start_at = Date.now();
-            var _send = res.send;
+            const exec_start_at = Date.now();
+            const _send = res.send;
             res.send = function () {
                 res.set('X-Execution-Time', String(Date.now() - exec_start_at));
                 return _send.apply(res, arguments);
@@ -59,7 +56,7 @@ var Uuaper = function (params) {
             next();
         });
 
-        for (var i = 0; i < params.server.proxyPath.length; i++) {
+        for (let i = 0; i < params.server.proxyPath.length; i++) {
             app.use(params.server.proxyPath[i], function (req, res) {
                 self.proxyData(req, res);
             });
@@ -71,8 +68,7 @@ var Uuaper = function (params) {
             console.log('Server listening on http://localhost:' + params.server.port + ', Ctrl+C to stop')
         });
         return this;
-    }
-    else {
+    } else {
         return function (req, res, next) {
             self._options.mock ? self.mockData(req, res, next) : self.proxyData(req, res, next);
         }
@@ -83,8 +79,10 @@ Uuaper.client = birdAuth.client;
 
 function dealCookie(options, cookie, cb) {
     Uuaper.client.clear_cookies();
+
     if (options.auth.forwardCookie) {
         Uuaper.client.set_cookies(cookie);
+
         options.auth.forwardCookie(function (newCookie) {
             if (!newCookie) {
                 throw new Error('where you new auth cookies ?');
@@ -95,8 +93,7 @@ function dealCookie(options, cookie, cb) {
             }
             cb && cb();
         });
-    }
-    else {
+    } else {
         options.cookie = cookie;
         if (options.debug) {
             console.log(CONSOLE_COLOR_GREEN, 'Cookie: =======> ', options.cookie);
@@ -106,7 +103,7 @@ function dealCookie(options, cookie, cb) {
 }
 
 Uuaper.prototype.getCookie = function (cb) {
-    var self = this;
+    const self = this;
     if (self._options.auth.getAuth) {
         self._options.auth.getAuth(function (cookie) {
             if (!cookie) {
@@ -114,8 +111,7 @@ Uuaper.prototype.getCookie = function (cb) {
             }
             dealCookie(self._options, cookie, cb);
         });
-    }
-    else {
+    } else {
         new birdAuth[self._options.auth.type || 'uuap'](self._options.auth, function (cookie) {
             dealCookie(self._options, cookie, cb);
         });
@@ -123,9 +119,9 @@ Uuaper.prototype.getCookie = function (cb) {
 };
 
 Uuaper.prototype.retry = function (req, res, body) {
-    var self = this;
+    const self = this;
     this.getCookie(function () {
-        var options = self._options;
+        const options = self._options;
         if (!res.headersSent) {
             req.headers.cookie = options.cookie;
         }
@@ -141,16 +137,17 @@ Uuaper.prototype.retry = function (req, res, body) {
 };
 
 Uuaper.prototype.proxyData = function (req, res, next) {
-    var self = this;
-    var options = self._options;
-    var tmp = req.originalUrl.match(/\?/i) ? req.originalUrl.match(/(.+)\?{1}/i)[1] : req.originalUrl;
+    const self = this;
+    const options = self._options;
+    const tmp = req.originalUrl.match(/\?/i) ? req.originalUrl.match(/(.+)\?{1}/i)[1] : req.originalUrl;
 
     if (options.debug) {
         console.log(CONSOLE_COLOR_GREEN, req.originalUrl + ' > ' + options.target + req.originalUrl);
     }
+
     req.headers.cookie = options.cookie || '';
     if (options.headers) {
-        for (var item in options.headers) {
+        for (let item in options.headers) {
             req.headers[item] = options.headers[item];
         }
     }
@@ -168,16 +165,16 @@ Uuaper.prototype.proxyData = function (req, res, next) {
                 }
                 if (resp.headers['content-type']
                     && resp.headers['content-type'].match(/(text\/html|application\/json)/g)) {
-                    var data = data.toString();
+                    const data = data.toString();
                     if (!data) {
                         options.auth && self.retry(req, res, body);
                         return;
                     }
                     if (options.cache && resp.headers['content-type'].match(/json/g)) {
-                        var filePath = path.join(options.cache, tmp + '.json');
-                        fs.exists(filePath, function (isExist) {
+                        const filePath = path.join(options.cache, tmp + '.json');
+                        fs.exists(filePath, function (isExist) { // TODO remove deprecated api
                             if (!isExist) {
-                                fsPath.writeFile(filePath, data, function (error) {
+                                fsPath.writeFile(filePath, data, function (error) { // TODO why fsPath??
                                     if (error) {
                                         console.error(error);
                                     }
@@ -193,12 +190,12 @@ Uuaper.prototype.proxyData = function (req, res, next) {
 };
 
 Uuaper.prototype.mockData = function (req, res, next) {
-    var options = this._options;
-    var tmp = req.originalUrl.match(/\?/i)
+    const options = this._options;
+    const tmp = req.originalUrl.match(/\?/i)
         ? req.originalUrl.match(/(.+)\?{1}/i)[1]
         : req.originalUrl;
-    var filePath = path.join(options.cache, tmp + '.json');
-    var self = this;
+    const filePath = path.join(options.cache, tmp + '.json');
+    const self = this;
     fs.exists(filePath, function (isExist) {
         if (isExist) {
             fs.readFile(filePath, 'utf-8', function (err, data) {
@@ -208,8 +205,7 @@ Uuaper.prototype.mockData = function (req, res, next) {
                 res.set('X-Uuaper-Type', 'mock');
                 res.send(data);
             });
-        }
-        else {
+        } else {
             self.proxyData(req, res, next);
         }
     });
