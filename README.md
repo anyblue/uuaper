@@ -139,8 +139,11 @@ var uuap = new uuaper({
 *  ~~静态资源文件proxy~~
 *  Do more...
 
+* 代码待整理，先发个包。
+
 ## History
 
+- [3.0.0] update new auth.
 - [2.0.9] update bird-auth.
 - [2.0.8] fix fsPath.writeFile error
 - [2.0.7] add request body size `limit` setting
