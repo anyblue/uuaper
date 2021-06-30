@@ -37,7 +37,7 @@ module.exports = function (host, options) {
         } else if (body) {
             runProxy(null, body);
         } else {
-            // 二次触发解析失败，原因位置，暂时用body-parse
+            // 二次触发解析失败，原因未知，暂时用body-parse
             getRawBody(req, {
                 length: req.headers['content-length'],
                 limit,
@@ -48,15 +48,14 @@ module.exports = function (host, options) {
         function runProxy(err, bodyContent) {
             // console.log(bodyContent)
             const exec_start_at = Date.now();
+            const {host, port, path} = parsedHost;
 
             const reqOpt = {
-                hostname: parsedHost.host,
-                port: options.port || parsedHost.port,
+                hostname: host,
+                port: options.port || port,
                 headers: reqHeaders(req, options),
                 method: req.method,
-                path: (parsedHost.path.charAt(parsedHost.path.length - 1) === '/'
-                    ? parsedHost.path.substring(0, parsedHost.path.length - 1)
-                    : parsedHost.path) + path,
+                path: (path.charAt(path.length - 1) === '/' ? path.substring(0, path.length - 1) : path) + path,
                 bodyContent: bodyContent,
                 params: req.params,
                 rejectUnauthorized: false
@@ -131,9 +130,7 @@ module.exports = function (host, options) {
                     // console.log(resp.headers);
                     res.status(resp.statusCode);
                     Object.keys(resp.headers)
-                        .filter(function (item) {
-                            return item != 'transfer-encoding';
-                        })
+                        .filter(item => item !== 'transfer-encoding')
                         .forEach(function (item) {
                             // .replace(/(\w)/,function(v){return v.toUpperCase()})
                             res.set(item.replace(/(\w)/, function (v) {
@@ -177,7 +174,7 @@ module.exports = function (host, options) {
 
     function defaultForwardPathAsync(forwardPath) {
         return function (req, res) {
-            return new promise.Promise(function (resolve) {
+            return new promise.Promise(function (resolve) { // TODO new promise??? 旧方法，考虑移除
                 resolve(forwardPath(req, res));
             });
         };
@@ -201,8 +198,7 @@ module.exports = function (host, options) {
 
         const hds = extend(headers, req.headers, skipHdrs);
         hds.connection = 'close';
-        // hds['accept-encoding']
-        // console.log(hds)
+
         return hds;
     }
 
@@ -255,12 +251,10 @@ module.exports = function (host, options) {
     }
 
     function chunkLength(chunks) {
-        return chunks.reduce(function (len, buf) {
-            return len + buf.length;
-        }, 0);
+        return chunks.reduce((len, buf) => len + buf.length, 0);
     }
 
-    function parseHost(host, req) {
+    function parseHost(host, req) { // TODO 优化host参数的使用
         // console.log(arguments)
         host = (typeof host === 'function') ? host(req) : host.toString();
         if (!host) {

@@ -12,27 +12,28 @@ const CONSOLE_COLOR_GREEN = '\x1b[33m%s\x1b[0m';
 const Uuaper = function (params) {
     if (!params) throw new Error('Where you params?');
 
-    if (params.service) {
+    const {service, cache, target, debug, headers, mock, auth, server, limit} = params;
+    if (service) {
         throw new Error('Uuaper 2.x version is not support 1.x settings, you can `npm install uuaper@1.3.4 --save`.');
     }
 
-    if (params.cache && typeof params.cache !== 'string') {
+    if (cache && typeof cache !== 'string') {
         throw new Error('the cache setting must be a path string.');
     }
 
     this._options = {
-        target: params.target,
-        debug: params.debug || false,
-        headers: params.headers || {},
-        mock: params.mock,
-        cache: params.cache,
-        auth: params.auth,
-        server: params.server,
-        limit: params.limit
+        target,
+        debug: debug || false,
+        headers: headers || {},
+        mock,
+        cache,
+        auth,
+        server,
+        limit
     };
 
-    if (params.auth) {
-        if (params.debug) {
+    if (auth) {
+        if (debug) {
             console.log(CONSOLE_COLOR_YELLOW, '===== Auto Get Cookies Mode =====\n');
         }
         this.onlyProxy = false;
@@ -42,7 +43,7 @@ const Uuaper = function (params) {
     }
 
     const self = this;
-    if (params.server) {
+    if (server) {
         const express = require('express');
         const app = this.app = express();
 
@@ -56,16 +57,16 @@ const Uuaper = function (params) {
             next();
         });
 
-        for (let i = 0; i < params.server.proxyPath.length; i++) {
-            app.use(params.server.proxyPath[i], function (req, res) {
+        server.proxyPath.forEach(item => {
+            app.use(item, function (req, res) {
                 self.proxyData(req, res);
             });
-        }
+        });
 
-        app.use(express.static(params.server.staticPath || __dirname));
+        app.use(express.static(server.staticPath || __dirname));
 
-        app.listen(params.server.port || 1337, function () {
-            console.log('Server listening on http://localhost:' + params.server.port + ', Ctrl+C to stop')
+        app.listen(server.port || 1337, function () {
+            console.log('Server listening on http://localhost:' + server.port + ', Ctrl+C to stop')
         });
         return this;
     } else {
@@ -138,40 +139,40 @@ Uuaper.prototype.retry = function (req, res, body) {
 
 Uuaper.prototype.proxyData = function (req, res, next) {
     const self = this;
-    const options = self._options;
+    const {debug, target, cookie, headers, limit, onlyProxy, auth, cache} = self._options;
     const tmp = req.originalUrl.match(/\?/i) ? req.originalUrl.match(/(.+)\?{1}/i)[1] : req.originalUrl;
 
-    if (options.debug) {
-        console.log(CONSOLE_COLOR_GREEN, req.originalUrl + ' > ' + options.target + req.originalUrl);
+    if (debug) {
+        console.log(CONSOLE_COLOR_GREEN, req.originalUrl + ' > ' + target + req.originalUrl);
     }
 
-    req.headers.cookie = options.cookie || '';
-    if (options.headers) {
-        for (let item in options.headers) {
-            req.headers[item] = options.headers[item];
+    req.headers.cookie = cookie || '';
+    if (headers) {
+        for (let item in headers) {
+            req.headers[item] = headers[item];
         }
     }
-    httpProxy(options.target, {
-        limit: options.limit || '10mb',
-        headers: options.headers,
+    httpProxy(target, {
+        limit: limit || '10mb',
+        headers,
         forwardPath: function (req) {
             return req.originalUrl;
         },
         intercept: function (resp, data, req, res, body, callback) {
-            if (!options.onlyProxy) {
-                if ((options.auth && options.auth.retry && options.auth.retry(resp, data && data.toString()))) {
+            if (!onlyProxy) {
+                if (auth && auth.retry && auth.retry(resp, data && data.toString())) {
                     self.retry(req, res, body);
                     return;
                 }
-                if (resp.headers['content-type']
-                    && resp.headers['content-type'].match(/(text\/html|application\/json)/g)) {
+                const pattern = /(text\/html|application\/json)/g;
+                if (resp.headers['content-type'] && resp.headers['content-type'].match(pattern)) {
                     const data = data.toString();
                     if (!data) {
-                        options.auth && self.retry(req, res, body);
+                        auth && self.retry(req, res, body);
                         return;
                     }
-                    if (options.cache && resp.headers['content-type'].match(/json/g)) {
-                        const filePath = path.join(options.cache, tmp + '.json');
+                    if (cache && resp.headers['content-type'].match(/json/g)) {
+                        const filePath = path.join(cache, tmp + '.json');
                         fs.exists(filePath, function (isExist) { // TODO remove deprecated api
                             if (!isExist) {
                                 fsPath.writeFile(filePath, data, function (error) { // TODO why fsPath??
@@ -190,16 +191,16 @@ Uuaper.prototype.proxyData = function (req, res, next) {
 };
 
 Uuaper.prototype.mockData = function (req, res, next) {
-    const options = this._options;
+    const {cache, debug} = this._options;
     const tmp = req.originalUrl.match(/\?/i)
         ? req.originalUrl.match(/(.+)\?{1}/i)[1]
         : req.originalUrl;
-    const filePath = path.join(options.cache, tmp + '.json');
+    const filePath = path.join(cache, tmp + '.json');
     const self = this;
     fs.exists(filePath, function (isExist) {
         if (isExist) {
             fs.readFile(filePath, 'utf-8', function (err, data) {
-                if (options.debug) {
+                if (debug) {
                     console.log(CONSOLE_COLOR_YELLOW, tmp + ' > ' + filePath);
                 }
                 res.set('X-Uuaper-Type', 'mock');
