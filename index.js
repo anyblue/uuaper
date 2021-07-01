@@ -3,7 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const birdAuth = require('bird-auth');
-const fsPath = require('fs-path');
+// const fsPath = require('fs-path');
 const httpProxy = require('./libs/proxy');
 
 const CONSOLE_COLOR_YELLOW = '\x1b[34m%s\x1b[0m';
@@ -57,6 +57,7 @@ const Uuaper = function (params) {
             next();
         });
 
+        debugger;
         server.proxyPath.forEach(item => {
             app.use(item, function (req, res) {
                 self.proxyData(req, res);
@@ -159,6 +160,7 @@ Uuaper.prototype.proxyData = function (req, res, next) {
             return req.originalUrl;
         },
         intercept: function (resp, data, req, res, body, callback) {
+            // let localData = data;
             if (!onlyProxy) {
                 if (auth && auth.retry && auth.retry(resp, data && data.toString())) {
                     self.retry(req, res, body);
@@ -166,20 +168,28 @@ Uuaper.prototype.proxyData = function (req, res, next) {
                 }
                 const pattern = /(text\/html|application\/json)/g;
                 if (resp.headers['content-type'] && resp.headers['content-type'].match(pattern)) {
-                    const data = data.toString();
+                    var data = data.toString();
                     if (!data) {
                         auth && self.retry(req, res, body);
                         return;
                     }
                     if (cache && resp.headers['content-type'].match(/json/g)) {
                         const filePath = path.join(cache, tmp + '.json');
-                        fs.exists(filePath, function (isExist) { // TODO remove deprecated api
-                            if (!isExist) {
-                                fsPath.writeFile(filePath, data, function (error) { // TODO why fsPath??
-                                    if (error) {
-                                        console.error(error);
-                                    }
-                                });
+                        // fs.exists(filePath, function (isExist) { // TODO remove deprecated api
+                        //     if (!isExist) {
+                        //         fsPath.writeFile(filePath, data, function (error) { // TODO why fsPath??
+                        //             if (error) {
+                        //                 console.error(error);
+                        //             }
+                        //         });
+                        //     }
+                        // });
+
+                        fs.writeFile(filePath, data, error => {
+                            if (error) {
+                                console.log(error.code); // TODO test code 
+                                console.error(error);
+                                return;
                             }
                         });
                     }

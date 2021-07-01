@@ -1,6 +1,6 @@
 'use strict';
 
-const url = require('url');
+const {URL} = require('url');
 const http = require('http');
 const https = require('https');
 const getRawBody = require('raw-body');
@@ -24,12 +24,14 @@ module.exports = function (host, options) {
         }
         forwardPathAsync(req, res)
             .then(function (path) {
+                console.log('----------> ', path);
                 proxyWithResolvedPath(req, res, next, path);
             })
     };
 
     function proxyWithResolvedPath(req, res, next, path) {
         // console.log(req)
+        const localPath = path;
         parsedHost = parsedHost || parseHost(host, req);
 
         if (req.body) {
@@ -55,11 +57,12 @@ module.exports = function (host, options) {
                 port: options.port || port,
                 headers: reqHeaders(req, options),
                 method: req.method,
-                path: (path.charAt(path.length - 1) === '/' ? path.substring(0, path.length - 1) : path) + path,
+                path: (path.charAt(path.length - 1) === '/' ? path.substring(0, path.length - 1) : path) + localPath,
                 bodyContent: bodyContent,
                 params: req.params,
                 rejectUnauthorized: false
             };
+            console.log('reqOpt--------> ', {...reqOpt});
 
             // bodyContent = reqOpt.bodyContent;
             delete reqOpt.bodyContent;
@@ -94,7 +97,7 @@ module.exports = function (host, options) {
                             if (err) {
                                 return next(err);
                             }
-                            // console.log(respData.toString())
+                            console.log('------------------>', respData.toString());
                             respd = asBuffer(respd, options);
                             if (!Buffer.isBuffer(respd)) {
                                 next(new Error('intercept should return string or buffer as data'));
@@ -169,7 +172,8 @@ module.exports = function (host, options) {
     }
 
     function defaultForwardPath(req) {
-        return url.parse(req.url).path; // TODO remove deprecated api.
+        const {pathname, search} = new URL(req.url);
+        return pathname + search;
     }
 
     function defaultForwardPathAsync(forwardPath) {
@@ -217,18 +221,22 @@ module.exports = function (host, options) {
     }
 
     function asBuffer(body, options) {
+        console.log('------------------------->', '到了buffer的地方了。。。');
         let ret;
         if (Buffer.isBuffer(body)) {
             ret = body;
         } else if (typeof body === 'object') {
             ret = new Buffer(JSON.stringify(body), bodyEncoding(options)); // TODO remove deprecated api.
+            // ret = Buffer.from(JSON.stringify(body), bodyEncoding(options));
         } else if (typeof body === 'string') {
             ret = new Buffer(body, bodyEncoding(options));
+            // ret = Buffer.from(body, bodyEncoding(options));
         }
         return ret;
     }
 
     function asBufferOrString(body) {
+        console.log('asBuffer1OrString: ', body);
         let ret;
         if (Buffer.isBuffer(body)) {
             ret = body;
@@ -265,18 +273,18 @@ module.exports = function (host, options) {
             host = 'http://' + host;
         }
 
-        const parsed = url.parse(host);
+        const {protocol, hostname, port, pathname, search} = new URL(host);
 
-        if (!parsed.hostname) {
+        if (!hostname) {
             return new Error('Unable to parse hostname, possibly missing protocol://?');
         }
 
-        const ishttps = parsed.protocol === 'https:';
+        const ishttps = protocol === 'https:';
 
         return {
-            host: parsed.hostname,
-            port: parsed.port || (ishttps ? 443 : 80),
-            path: parsed.path,
+            host: hostname,
+            port: port || (ishttps ? 443 : 80),
+            path: pathname + search,
             module: ishttps ? https : http
         };
     }
