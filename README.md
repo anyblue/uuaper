@@ -15,7 +15,7 @@ Proxy tool based on NodeJS for front-end development.
 ## Install
 
 ``` bash
-    npm install --save uuaper
+    npm install --save-dev uuaper
 ```
 
 ## 配置项
@@ -41,11 +41,11 @@ Proxy tool based on NodeJS for front-end development.
 
 ## Usage
 
-### 自定headers & 启动 server
+### 自定义headers & 启动server
 
 ```javascript
-var uuaper = require('uuaper');
-var uuap = new uuaper({
+const uuaper = require('uuaper');
+const uuap = new uuaper({
     target: 'http://xxx.xxx.com/',
     headers: {
         cookie: 'xxx'
@@ -62,10 +62,10 @@ var uuap = new uuaper({
 #### 结合express使用实现接口转发功能
 
 ```javascript
-var express = require('express');
-var app = express();
+const express = require('express');
+const app = express();
 
-var uuaper = require('uuaper');
+const uuaper = require('uuaper');
 app.use('/api', new uuaper({
     target: 'http://xxx.baidu.com/',
     debug: true,
@@ -79,14 +79,13 @@ app.use('/api', new uuaper({
 #### baidu uuap 自动认证
 
 ```javascript
-var uuaper = require('uuaper');
-var uuap = new uuaper({
+const uuaper = require('uuaper');
+const uuap = new uuaper({
     target: 'http://xxx.xxx.com/',
     auth: {
         username: 'xxx',
         password: 'xxx',
-        server: 'http://xxx.baidu.com/login?',
-        rsa: 'xxx',
+        server: 'http://xxx.xxx.com/login?service=xxxx',
         retry: function(res, data) {
             return +res.statusCode === 403;
         }
@@ -97,14 +96,14 @@ var uuap = new uuaper({
 #### baidu passport 自动认证
 
 ```javascript
-var uuaper = require('uuaper');
-var uuap = new uuaper({
+const uuaper = require('uuaper');
+const uuap = new uuaper({
     target: 'http://xxx.xxx.com/',
     auth: {
         type: 'passport',
         username: 'xxx',
         password: 'xxx',
-        server: 'https://passport.qatest.baidu.com/', //default passport.baidu.com
+        server: 'https://passport.qatest.xxx.com/', //default passport.xxx.com
         forwardCookie: function (cb) {
             // use `uuaper.client` do something to get extrenal cookie
             uuaper.client.get('xxx.baidu.com', function () {
@@ -159,8 +158,8 @@ var uuap = new uuaper({
 - [1.0.x] 重构，使用[bird-auth](https://www.npmjs.com/package/bird-auth)包进行cookie获取，同时优化内置server
 - [0.1.7] 老版本
 
-[npm-image]: https://img.shields.io/badge/npm-v2.0.9-blue.svg
+[npm-image]: https://img.shields.io/badge/npm-v5.3.6-blue.svg
 [npm-url]: https://npmjs.org/package/uuaper
-[node-image]: https://img.shields.io/badge/node-v0.12.0%2B-yellow.svg
+[node-image]: https://img.shields.io/badge/node-v10.0.0%2B-yellow.svg
 [osx-image]: https://img.shields.io/badge/OSX-passing-brightgreen.svg
 [liunx-image]: https://img.shields.io/badge/Liunx-passing-brightgreen.svg
