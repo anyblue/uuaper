@@ -129,19 +129,17 @@ module.exports = function (host, options) {
                 });
 
                 if (!res.headersSent) {
-                    // console.log(resp.headers);
                     res.status(resp.statusCode);
                     Object.keys(resp.headers)
                         .filter(item => item !== 'transfer-encoding')
                         .forEach(function (item) {
-                            // .replace(/(\w)/,function(v){return v.toUpperCase()})
                             res.set(item.replace(/(\w)/, function (v) {
                                 return v.toUpperCase()
                             }), resp.headers[item])
                         })
                 }
             });
-            // console.log(realRequest)
+
             realRequest.on('error', function (err) {
                 if (err.code === 'ECONNRESET') {
                     res.setHeader('X-Timout-Reason',
