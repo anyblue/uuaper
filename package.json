@@ -1,6 +1,6 @@
 {
   "name": "uuaper",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "description": "Proxy tool based on nodejs for front-end development",
   "main": "index.js",
   "scripts": {
@@ -23,6 +23,6 @@
   "dependencies": {
     "bird-auth": "^2.1.0",
     "express": "^4.14.0",
-    "raw-body": "^2.1.7"
+    "raw-body": "^2.4.1"
   }
 }

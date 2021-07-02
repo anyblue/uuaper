@@ -171,7 +171,7 @@ Uuaper.prototype.proxyData = function (req, res, next) {
                         return;
                     }
                     if (cache && resp.headers['content-type'].match(/json/g)) {
-                        const filePath = path.join(cache, tmp + '.json');
+                        const filePath = path.join(cache, tmp, '.json');
                         if (!fs.existsSync(filePath)) {
                             fs.writeFile(filePath, localData, error => {
                                 if (error) {
@@ -194,7 +194,7 @@ Uuaper.prototype.mockData = function (req, res, next) {
         ? req.originalUrl.match(/(.+)\?{1}/i)[1]
         : req.originalUrl;
 
-    const filePath = path.join(cache, tmp + '.json');
+    const filePath = path.join(cache, tmp, '.json');
     if (fs.existsSync(filePath)) {
         fs.readFile(filePath, 'utf-8', function (err, data) {
             if (debug) {
