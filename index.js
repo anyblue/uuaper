@@ -3,11 +3,10 @@
 const fs = require('fs');
 const path = require('path');
 const birdAuth = require('bird-auth');
-// const fsPath = require('fs-path');
 const httpProxy = require('./libs/proxy');
 
-const CONSOLE_COLOR_YELLOW = '\x1b[34m%s\x1b[0m';
-const CONSOLE_COLOR_GREEN = '\x1b[33m%s\x1b[0m';
+const CONSOLE_COLOR_BLUE = '\x1b[34m%s\x1b[0m';
+const CONSOLE_COLOR_YELLOW = '\x1b[33m%s\x1b[0m';
 
 const Uuaper = function (params) {
     if (!params) throw new Error('Where you params?');
@@ -34,7 +33,7 @@ const Uuaper = function (params) {
 
     if (auth) {
         if (debug) {
-            console.log(CONSOLE_COLOR_YELLOW, '===== Auto Get Cookies Mode =====\n');
+            console.log(CONSOLE_COLOR_BLUE, '===== Auto Get Cookies Mode =====\n');
         }
         this.onlyProxy = false;
         this.getCookie();
@@ -91,14 +90,14 @@ function dealCookie(options, cookie, cb) {
             }
             options.cookie = newCookie;
             if (options.debug) {
-                console.log(CONSOLE_COLOR_GREEN, 'New Cookie: =======> ', options.cookie);
+                console.log(CONSOLE_COLOR_YELLOW, 'New Cookie: =======> ', options.cookie);
             }
             cb && cb();
         });
     } else {
         options.cookie = cookie;
         if (options.debug) {
-            console.log(CONSOLE_COLOR_GREEN, 'Cookie: =======> ', options.cookie);
+            console.log(CONSOLE_COLOR_YELLOW, 'Cookie: =======> ', options.cookie);
         }
         cb && cb();
     }
@@ -144,7 +143,7 @@ Uuaper.prototype.proxyData = function (req, res, next) {
     const tmp = req.originalUrl.match(/\?/i) ? req.originalUrl.match(/(.+)\?{1}/i)[1] : req.originalUrl;
 
     if (debug) {
-        console.log(CONSOLE_COLOR_GREEN, req.originalUrl + ' > ' + target + req.originalUrl);
+        console.log(CONSOLE_COLOR_YELLOW, req.originalUrl + ' > ' + target + req.originalUrl);
     }
 
     req.headers.cookie = cookie || '';
@@ -175,23 +174,14 @@ Uuaper.prototype.proxyData = function (req, res, next) {
                     }
                     if (cache && resp.headers['content-type'].match(/json/g)) {
                         const filePath = path.join(cache, tmp + '.json');
-                        // fs.exists(filePath, function (isExist) { // TODO remove deprecated api
-                        //     if (!isExist) {
-                        //         fsPath.writeFile(filePath, data, function (error) { // TODO why fsPath??
-                        //             if (error) {
-                        //                 console.error(error);
-                        //             }
-                        //         });
-                        //     }
-                        // });
-
-                        fs.writeFile(filePath, data, error => {
-                            if (error) {
-                                console.log(error.code); // TODO test code 
-                                console.error(error);
-                                return;
-                            }
-                        });
+                        if (!fs.existsSync(filePath)) {
+                            fs.writeFile(filePath, data, error => {
+                                if (error) {
+                                    console.error(error);
+                                    return;
+                                }
+                            });
+                        }
                     }
                 }
             }
@@ -205,21 +195,19 @@ Uuaper.prototype.mockData = function (req, res, next) {
     const tmp = req.originalUrl.match(/\?/i)
         ? req.originalUrl.match(/(.+)\?{1}/i)[1]
         : req.originalUrl;
+
     const filePath = path.join(cache, tmp + '.json');
-    const self = this;
-    fs.exists(filePath, function (isExist) {
-        if (isExist) {
-            fs.readFile(filePath, 'utf-8', function (err, data) {
-                if (debug) {
-                    console.log(CONSOLE_COLOR_YELLOW, tmp + ' > ' + filePath);
-                }
-                res.set('X-Uuaper-Type', 'mock');
-                res.send(data);
-            });
-        } else {
-            self.proxyData(req, res, next);
-        }
-    });
+    if (fs.existsSync(filePath)) {
+        fs.readFile(filePath, 'utf-8', function (err, data) {
+            if (debug) {
+                console.log(CONSOLE_COLOR_BLUE, tmp + ' > ' + filePath);
+            }
+            res.set('X-Uuaper-Type', 'mock');
+            res.send(data);
+        });
+    } else {
+        this.proxyData(req, res, next);
+    }
 };
 
 module.exports = Uuaper;

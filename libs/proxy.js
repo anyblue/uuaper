@@ -24,7 +24,6 @@ module.exports = function (host, options) {
         }
         forwardPathAsync(req, res)
             .then(function (path) {
-                console.log('----------> ', path);
                 proxyWithResolvedPath(req, res, next, path);
             })
     };
@@ -221,16 +220,13 @@ module.exports = function (host, options) {
     }
 
     function asBuffer(body, options) {
-        console.log('------------------------->', '到了buffer的地方了。。。');
         let ret;
         if (Buffer.isBuffer(body)) {
             ret = body;
         } else if (typeof body === 'object') {
-            ret = new Buffer(JSON.stringify(body), bodyEncoding(options)); // TODO remove deprecated api.
-            // ret = Buffer.from(JSON.stringify(body), bodyEncoding(options));
+            ret = Buffer.from(JSON.stringify(body), bodyEncoding(options));
         } else if (typeof body === 'string') {
-            ret = new Buffer(body, bodyEncoding(options));
-            // ret = Buffer.from(body, bodyEncoding(options));
+            ret = Buffer.from(body, bodyEncoding(options));
         }
         return ret;
     }
@@ -262,8 +258,7 @@ module.exports = function (host, options) {
         return chunks.reduce((len, buf) => len + buf.length, 0);
     }
 
-    function parseHost(host, req) { // TODO 优化host参数的使用
-        // console.log(arguments)
+    function parseHost(host, req) {
         host = (typeof host === 'function') ? host(req) : host.toString();
         if (!host) {
             return new Error('Empty host parameter');
