@@ -32,10 +32,10 @@ const Uuaper = function (params) {
     };
 
     if (auth) {
+        this.onlyProxy = false;
         if (debug) {
             console.log(CONSOLE_COLOR_BLUE, '===== Auto Get Cookies Mode =====\n');
         }
-        this.onlyProxy = false;
         this.getCookie();
     } else {
         this.onlyProxy = true;
@@ -56,7 +56,6 @@ const Uuaper = function (params) {
             next();
         });
 
-        debugger;
         server.proxyPath.forEach(item => {
             app.use(item, function (req, res) {
                 self.proxyData(req, res);
@@ -159,7 +158,6 @@ Uuaper.prototype.proxyData = function (req, res, next) {
             return req.originalUrl;
         },
         intercept: function (resp, data, req, res, body, callback) {
-            // let localData = data;
             if (!onlyProxy) {
                 if (auth && auth.retry && auth.retry(resp, data && data.toString())) {
                     self.retry(req, res, body);
@@ -167,15 +165,15 @@ Uuaper.prototype.proxyData = function (req, res, next) {
                 }
                 const pattern = /(text\/html|application\/json)/g;
                 if (resp.headers['content-type'] && resp.headers['content-type'].match(pattern)) {
-                    var data = data.toString();
-                    if (!data) {
+                    const localData = data.toString();
+                    if (!localData) {
                         auth && self.retry(req, res, body);
                         return;
                     }
                     if (cache && resp.headers['content-type'].match(/json/g)) {
                         const filePath = path.join(cache, tmp + '.json');
                         if (!fs.existsSync(filePath)) {
-                            fs.writeFile(filePath, data, error => {
+                            fs.writeFile(filePath, localData, error => {
                                 if (error) {
                                     console.error(error);
                                     return;
