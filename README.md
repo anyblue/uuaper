@@ -128,8 +128,7 @@ var uuap = new uuaper({
 <!--- mock (是否启用mock本地数据，依赖`mockDir`，如果本地不存在该文件，则会取一遍，默认`false`)-->
 <!--- mockCache (是否每次请求都进行保存操作，依赖`mockDir`参数，默认`false`不开启)-->
 
-##TODO
-
+## TODO（很久很久之前的）
 *  mock 支持带参数的url
 *  cache 支持多类型
 *  ~~bprouting 302 deal~~
@@ -139,10 +138,10 @@ var uuap = new uuaper({
 *  ~~静态资源文件proxy~~
 *  Do more...
 
-* 代码待整理，先发个包。
 
 ## History
 
+- [3.1.0] 修复重构代码导致的runProxy错误，移除es-promise和fs-path包。
 - [3.0.0] update new auth.
 - [2.0.9] update bird-auth.
 - [2.0.8] fix fsPath.writeFile error
