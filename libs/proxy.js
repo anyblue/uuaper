@@ -1,9 +1,9 @@
 'use strict';
 
-const {URL} = require('url');
 const http = require('http');
 const https = require('https');
 const getRawBody = require('raw-body');
+const {URL} = require('url');
 
 module.exports = function (host, options) {
     options = options || {};
@@ -221,7 +221,6 @@ module.exports = function (host, options) {
     }
 
     function asBufferOrString(body) {
-        console.log('asBuffer1OrString: ', body);
         let ret;
         if (Buffer.isBuffer(body)) {
             ret = body;
