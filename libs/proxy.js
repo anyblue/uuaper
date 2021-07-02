@@ -4,7 +4,6 @@ const {URL} = require('url');
 const http = require('http');
 const https = require('https');
 const getRawBody = require('raw-body');
-const promise = require('es6-promise'); // TODO 是否还有必要？
 
 module.exports = function (host, options) {
     options = options || {};
@@ -29,7 +28,6 @@ module.exports = function (host, options) {
     };
 
     function proxyWithResolvedPath(req, res, next, path) {
-        // console.log(req)
         const localPath = path;
         parsedHost = parsedHost || parseHost(host, req);
 
@@ -47,7 +45,6 @@ module.exports = function (host, options) {
         }
 
         function runProxy(err, bodyContent) {
-            // console.log(bodyContent)
             const exec_start_at = Date.now();
             const {host, port, path} = parsedHost;
 
@@ -61,7 +58,6 @@ module.exports = function (host, options) {
                 params: req.params,
                 rejectUnauthorized: false
             };
-            console.log('reqOpt--------> ', {...reqOpt});
 
             // bodyContent = reqOpt.bodyContent;
             delete reqOpt.bodyContent;
@@ -81,7 +77,6 @@ module.exports = function (host, options) {
                 reqOpt.headers['Accept-Encoding'] = bodyEncoding(options);
             }
 
-            // console.log(reqOpt)
             const realRequest = parsedHost.module.request(reqOpt, function (resp) {
                 const chunks = [];
                 resp.on('data', function (chunk) {
@@ -96,7 +91,7 @@ module.exports = function (host, options) {
                             if (err) {
                                 return next(err);
                             }
-                            console.log('------------------>', respData.toString());
+
                             respd = asBuffer(respd, options);
                             if (!Buffer.isBuffer(respd)) {
                                 next(new Error('intercept should return string or buffer as data'));
@@ -112,7 +107,7 @@ module.exports = function (host, options) {
                                 const error = '"Content-Length" is already sent, the length of response data can not be changed';
                                 next(new Error(error));
                             }
-                            // console.log(res)
+
                             if (!sent) {
                                 res.send(respd);
                             }
@@ -174,11 +169,7 @@ module.exports = function (host, options) {
     }
 
     function defaultForwardPathAsync(forwardPath) {
-        return function (req, res) {
-            return new promise.Promise(function (resolve) { // TODO new promise??? 旧方法，考虑移除
-                resolve(forwardPath(req, res));
-            });
-        };
+        return (req, res) => Promise.resolve(forwardPath(req, res));
     }
 
     function bodyEncoding(options) {
