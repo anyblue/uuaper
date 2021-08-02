@@ -173,6 +173,8 @@ Uuaper.prototype.proxyData = function (req, res, next) {
                     if (cache && resp.headers['content-type'].match(/json/g)) {
                         const filePath = path.join(cache, `${tmp}.json`);
                         if (!fs.existsSync(filePath)) {
+                            const dirPath = path.dirname(filePath);
+                            fs.mkdirSync(dirPath, {recursive: true});
                             fs.writeFile(filePath, localData, error => {
                                 if (error) {
                                     console.error(error);
