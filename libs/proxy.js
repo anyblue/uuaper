@@ -136,13 +136,17 @@ module.exports = function (host, options) {
             });
 
             realRequest.on('error', function (err) {
-                if (err.code === 'ECONNRESET') {
-                    res.setHeader('X-Timout-Reason',
-                        'Proxyer timed out your request after ' + options.timeout + 'ms.');
-                    res.writeHeader(504, {'Content-Type': 'text/plain'});
+                try {
+                    if (err.code === 'ECONNRESET') {
+                        res.setHeader('X-Timout-Reason',
+                            'Proxyer timed out your request after ' + options.timeout + 'ms.');
+                        res.writeHeader(504, {'Content-Type': 'text/plain'});
+                        res.end();
+                    } else {
+                        next(err);
+                    }
+                } catch (ex) {
                     res.end();
-                } else {
-                    next(err);
                 }
             });
 
