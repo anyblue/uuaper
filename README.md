@@ -140,6 +140,9 @@ const uuap = new uuaper({
 
 ## History
 
+- [3.2.0] 升级bird-auth，兼容新版验证机制
+- [3.1.4] 修复接口出错，导致服务不能启动问题
+- [3.1.3] 代码优化，修复缓存目录错误
 - [3.1.0] 修复重构代码导致的runProxy错误，移除es-promise和fs-path包。
 - [3.0.0] update new auth.
 - [2.0.9] update bird-auth.
