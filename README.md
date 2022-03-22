@@ -93,6 +93,26 @@ const uuap = new uuaper({
 });
 ```
 
+#### 手动设置 cookie 内容
+
+```javascript
+const uuaper = require('uuaper');
+const uuap = new uuaper({
+    target: 'http://xxx.xxx.com/',
+    auth: {
+        username: 'xxx',
+        password: 'xxx',
+        server: 'http://xxx.xxx.com/login?service=xxxx',
+        retry: function(res, data) {
+            return +res.statusCode === 403;
+        },
+        getAuth: function(cb) {
+            cb('cookie');
+        }
+    }
+});
+```
+
 #### baidu passport 自动认证
 
 ```javascript
@@ -140,6 +160,7 @@ const uuap = new uuaper({
 
 ## History
 
+- [3.3.0] 升级bird-auth，修复 token 获取失效问题。
 - [3.2.0] 升级bird-auth，兼容新版验证机制
 - [3.1.4] 修复接口出错，导致服务不能启动问题
 - [3.1.3] 代码优化，修复缓存目录错误
