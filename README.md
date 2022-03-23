@@ -102,6 +102,7 @@ const uuap = new uuaper({
     auth: {
         username: 'xxx',
         password: 'xxx',
+        type: 1, // default 1 is username and password; 3 is username and verification code.
         server: 'http://xxx.xxx.com/login?service=xxxx',
         retry: function(res, data) {
             return +res.statusCode === 403;

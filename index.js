@@ -112,7 +112,7 @@ Uuaper.prototype.getCookie = function (cb) {
             dealCookie(self._options, cookie, cb);
         });
     } else {
-        new birdAuth[self._options.auth.type || 'uuap'](self._options.auth, function (cookie) {
+        new birdAuth[self._options.auth.authType || 'uuap'](self._options.auth, function (cookie) {
             dealCookie(self._options, cookie, cb);
         });
     }
