@@ -65,7 +65,7 @@ const Uuaper = function (params) {
         app.use(express.static(server.staticPath || __dirname));
 
         app.listen(server.port || 1337, function () {
-            console.log('Server listening on http://localhost:' + server.port + ', Ctrl+C to stop')
+            console.log('Server listening on http://localhost:' + server.port + ', Ctrl + C to stop')
         });
         return this;
     } else {
@@ -145,12 +145,14 @@ Uuaper.prototype.proxyData = function (req, res, next) {
         console.log(CONSOLE_COLOR_YELLOW, req.originalUrl + ' > ' + target + req.originalUrl);
     }
 
-    req.headers.cookie = cookie || '';
+    req.headers.cookie = cookie || Uuaper.client.get_cookies_string() || '';
+
     if (headers) {
         for (let item in headers) {
             req.headers[item] = headers[item];
         }
     }
+
     httpProxy(target, {
         limit: limit || '10mb',
         headers,
@@ -185,6 +187,11 @@ Uuaper.prototype.proxyData = function (req, res, next) {
                     }
                 }
             }
+
+            if (resp.headers['set-cookie']) {
+                Uuaper.client.update_cookies(resp.headers['set-cookie']);
+            }
+
             callback(null, data);
         }
     })(req, res, next);
