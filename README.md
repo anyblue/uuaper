@@ -108,7 +108,7 @@ const uuap = new uuaper({
             return +res.statusCode === 403;
         },
         getAuth: function(cb) {
-            cb('cookie');
+            cb('your cookies');
         }
     }
 });
@@ -136,7 +136,6 @@ const uuap = new uuaper({
 ```
 
 <!--## 配置项-->
-
 <!--- **service** (必需配置，目标server，或者登出你们的系统，然后取url中service参数)-->
 <!--- cookie (自定义cookie，配置了该参数就无需配置`username/password/uuapServer`)-->
 <!--- username  (用户名)-->
@@ -148,19 +147,10 @@ const uuap = new uuaper({
 <!--- mock (是否启用mock本地数据，依赖`mockDir`，如果本地不存在该文件，则会取一遍，默认`false`)-->
 <!--- mockCache (是否每次请求都进行保存操作，依赖`mockDir`参数，默认`false`不开启)-->
 
-## TODO（很久很久之前的）
-*  mock 支持带参数的url
-*  cache 支持多类型
-*  ~~bprouting 302 deal~~
-*  ~~支持配置项~~
-*  ~~数据mock~~
-*  ~~mock no cache~~
-*  ~~静态资源文件proxy~~
-*  Do more...
-
-
 ## History
 
+- [3.3.2] 支持服务启动后，cookie 的更新
+- [3.3.1] 支持验证码方式
 - [3.3.0] 升级bird-auth，修复 token 获取失效问题。
 - [3.2.0] 升级bird-auth，兼容新版验证机制
 - [3.1.4] 修复接口出错，导致服务不能启动问题
