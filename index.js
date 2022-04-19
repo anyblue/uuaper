@@ -80,23 +80,22 @@ Uuaper.client = birdAuth.client;
 function dealCookie(options, cookie, cb) {
     Uuaper.client.clear_cookies();
 
-    if (options.auth.forwardCookie) {
-        Uuaper.client.set_cookies(cookie);
+    Uuaper.client.set_cookies(cookie);
 
+    if (options.auth.forwardCookie) {
         options.auth.forwardCookie(function (newCookie) {
             if (!newCookie) {
                 throw new Error('where you new auth cookies ?');
             }
-            options.cookie = newCookie;
+
             if (options.debug) {
-                console.log(CONSOLE_COLOR_YELLOW, 'New Cookie: =======> ', options.cookie);
+                console.log(CONSOLE_COLOR_YELLOW, 'New Cookie: =======> ', newCookie);
             }
             cb && cb();
         });
     } else {
-        options.cookie = cookie;
         if (options.debug) {
-            console.log(CONSOLE_COLOR_YELLOW, 'Cookie: =======> ', options.cookie);
+            console.log(CONSOLE_COLOR_YELLOW, 'Cookie: =======> ', cookie);
         }
         cb && cb();
     }
@@ -123,7 +122,7 @@ Uuaper.prototype.retry = function (req, res, body) {
     this.getCookie(function () {
         const options = self._options;
         if (!res.headersSent) {
-            req.headers.cookie = options.cookie;
+            req.headers.cookie = Uuaper.client.get_cookies_string();
         }
         httpProxy(options.target, {
             forwardPath: function (req) {
@@ -138,14 +137,14 @@ Uuaper.prototype.retry = function (req, res, body) {
 
 Uuaper.prototype.proxyData = function (req, res, next) {
     const self = this;
-    const {debug, target, cookie, headers, limit, onlyProxy, auth, cache} = self._options;
+    const {debug, target, headers, limit, onlyProxy, auth, cache} = self._options;
     const tmp = req.originalUrl.match(/\?/i) ? req.originalUrl.match(/(.+)\?{1}/i)[1] : req.originalUrl;
 
     if (debug) {
         console.log(CONSOLE_COLOR_YELLOW, req.originalUrl + ' > ' + target + req.originalUrl);
     }
 
-    req.headers.cookie = cookie || Uuaper.client.get_cookies_string() || '';
+    req.headers.cookie = Uuaper.client.get_cookies_string() || '';
 
     if (headers) {
         for (let item in headers) {
