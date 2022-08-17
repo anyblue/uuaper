@@ -16,6 +16,10 @@ const Uuaper = function (params) {
         throw new Error('Uuaper 2.x version is not support 1.x settings, you can `npm install uuaper@1.3.4 --save`.');
     }
 
+    if (auth && auth.server && /\/login?/.test(auth.server)) {
+        throw new Error('After 3.4.0 version, [auth.server] configuration needs to use "authorize" instead of "login".');
+    }
+
     if (cache && typeof cache !== 'string') {
         throw new Error('the cache setting must be a path string.');
     }
