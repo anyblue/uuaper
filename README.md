@@ -149,6 +149,7 @@ const uuap = new uuaper({
 
 ## History
 
+- [3.4.0] 切换默认配置，由 login 调整为使用 authorize，以便于更好的接入。
 - [3.3.3] 移除临时 cookie 的存储，统一使用 client 获取
 - [3.3.2] 支持服务启动后，cookie 的更新
 - [3.3.1] 支持验证码方式
