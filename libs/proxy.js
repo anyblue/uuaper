@@ -21,10 +21,9 @@ module.exports = function (host, options) {
         if (!filter(req, res)) {
             return next();
         }
-        forwardPathAsync(req, res)
-            .then(function (path) {
-                proxyWithResolvedPath(req, res, next, path);
-            })
+        forwardPathAsync(req, res).then(path => {
+            proxyWithResolvedPath(req, res, next, path);
+        });
     };
 
     function proxyWithResolvedPath(req, res, next, path) {
@@ -59,7 +58,6 @@ module.exports = function (host, options) {
                 rejectUnauthorized: false
             };
 
-            // bodyContent = reqOpt.bodyContent;
             delete reqOpt.bodyContent;
             delete reqOpt.params;
 
@@ -81,6 +79,11 @@ module.exports = function (host, options) {
                 const chunks = [];
                 resp.on('data', function (chunk) {
                     chunks.push(chunk);
+
+                    if (req.rawHeaders.indexOf('text/event-stream') > -1) {
+                        res.flushHeaders(); // flush the headers to establish SSE with client
+                        res.write(chunk);
+                    }
                 });
 
                 resp.on('end', function () {
@@ -108,7 +111,7 @@ module.exports = function (host, options) {
                                 next(new Error(error));
                             }
 
-                            if (!sent) {
+                            if (!sent && !res.headersSent) { // if headers were sent, nothing to do.
                                 res.send(respd);
                             }
                         })
