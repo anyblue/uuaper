@@ -85,7 +85,7 @@ const uuap = new uuaper({
     auth: {
         username: 'xxx',
         password: 'xxx',
-        server: 'http://xxx.xxx.com/login?service=xxxx',
+        server: 'http://xxx.xxx.com/authorize?service=xxxx',
         retry: function(res, data) {
             return +res.statusCode === 403;
         }
@@ -103,7 +103,7 @@ const uuap = new uuaper({
         username: 'xxx',
         password: 'xxx',
         type: 1, // default 1 is username and password; 3 is username and verification code.
-        server: 'http://xxx.xxx.com/login?service=xxxx',
+        server: 'http://xxx.xxx.com/authorize?service=xxxx',
         retry: function(res, data) {
             return +res.statusCode === 403;
         },
@@ -149,6 +149,7 @@ const uuap = new uuaper({
 
 ## History
 
+- [3.5.0] 新增支持 SSE 请求的代理
 - [3.4.0] 切换默认配置，由 login 调整为使用 authorize，以便于更好的接入。
 - [3.3.3] 移除临时 cookie 的存储，统一使用 client 获取
 - [3.3.2] 支持服务启动后，cookie 的更新
