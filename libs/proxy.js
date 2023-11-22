@@ -75,12 +75,13 @@ module.exports = function (host, options) {
                 reqOpt.headers['Accept-Encoding'] = bodyEncoding(options);
             }
 
+            const isSSE = req.headers.accept && req.headers.accept === 'text/event-stream';
             const realRequest = parsedHost.module.request(reqOpt, function (resp) {
                 const chunks = [];
                 resp.on('data', function (chunk) {
                     chunks.push(chunk);
 
-                    if (req.rawHeaders.indexOf('text/event-stream') > -1) {
+                    if (isSSE) {
                         res.flushHeaders(); // flush the headers to establish SSE with client
                         res.write(chunk);
                     }
@@ -113,6 +114,8 @@ module.exports = function (host, options) {
 
                             if (!sent && !res.headersSent) { // if headers were sent, nothing to do.
                                 res.send(respd);
+                            } else if (res.headersSent && isSSE) {
+                                res.end();
                             }
                         })
                     } else {
