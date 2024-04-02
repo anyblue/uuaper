@@ -10,7 +10,7 @@ Proxy tool based on NodeJS for front-end development.
 ## Feature
 
 * 前后端分离，前端会有跨域问题，本工具提供server端proxy :)
-* _baidu_ uuap 自动登录
+* 自动登录
 
 ## Install
 
@@ -37,7 +37,7 @@ Proxy tool based on NodeJS for front-end development.
 | `getAuth(cb)` | you auth logic |
 | `forwardCookie(cb)` | before make sure cookie |
 | `retry(res, data)` | retry logic |
-| baidu auth setting | baidu uuap auth [bird-auth](https://www.npmjs.com/package/bird-auth) |
+| auth setting | auth [bird-auth](https://www.npmjs.com/package/bird-auth) |
 
 ## Usage
 
@@ -45,7 +45,7 @@ Proxy tool based on NodeJS for front-end development.
 
 ```javascript
 const uuaper = require('uuaper');
-const uuap = new uuaper({
+const uupp = new uuaper({
     target: 'http://xxx.xxx.com/',
     headers: {
         cookie: 'xxx'
@@ -67,7 +67,7 @@ const app = express();
 
 const uuaper = require('uuaper');
 app.use('/api', new uuaper({
-    target: 'http://xxx.baidu.com/',
+    target: 'http://xxx.github.com/',
     debug: true,
     headers: {
         refer: 'http://xxx.com'
@@ -76,11 +76,11 @@ app.use('/api', new uuaper({
 }));
 ```
 
-#### baidu uuap 自动认证
+#### 自动认证
 
 ```javascript
 const uuaper = require('uuaper');
-const uuap = new uuaper({
+const uupp = new uuaper({
     target: 'http://xxx.xxx.com/',
     auth: {
         username: 'xxx',
@@ -97,7 +97,7 @@ const uuap = new uuaper({
 
 ```javascript
 const uuaper = require('uuaper');
-const uuap = new uuaper({
+const uupp = new uuaper({
     target: 'http://xxx.xxx.com/',
     auth: {
         username: 'xxx',
@@ -114,11 +114,11 @@ const uuap = new uuaper({
 });
 ```
 
-#### baidu passport 自动认证
+#### 自动认证
 
 ```javascript
 const uuaper = require('uuaper');
-const uuap = new uuaper({
+const uupp = new uuaper({
     target: 'http://xxx.xxx.com/',
     auth: {
         type: 'passport',
@@ -127,7 +127,7 @@ const uuap = new uuaper({
         server: 'https://passport.qatest.xxx.com/', //default passport.xxx.com
         forwardCookie: function (cb) {
             // use `uuaper.client` do something to get extrenal cookie
-            uuaper.client.get('xxx.baidu.com', function () {
+            uuaper.client.get('xxx.xxxx.com', function () {
                 cb && cb(uuaper.client.get_cookies_string());
             });
         }
@@ -165,7 +165,7 @@ const uuap = new uuaper({
 - [2.0.8] fix fsPath.writeFile error
 - [2.0.7] add request body size `limit` setting
 - [2.0.6] 支持自定义 `auth logic`
-- [2.0.5] 增加baidu.passport支持 & headers bugfix
+- [2.0.5] 增加 xxxx 支持 & headers bugfix
 - [2.0.0] 配置项优化
 - [1.3.4] `content-type`处理优化
 - [1.3.3] 增加`content-type`为`stream`判断
