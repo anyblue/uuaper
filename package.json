@@ -1,6 +1,6 @@
 {
   "name": "uuaper",
-  "version": "3.5.3",
+  "version": "3.6.0",
   "description": "Proxy tool based on nodejs for front-end development",
   "main": "index.js",
   "scripts": {
@@ -25,7 +25,7 @@
     "url": "https://github.com/anyblue/uuaper"
   },
   "dependencies": {
-    "bird-auth": "^2.4.1",
+    "bird-auth": "^2.5.1",
     "express": "^4.14.0",
     "raw-body": "^2.4.1"
   },
