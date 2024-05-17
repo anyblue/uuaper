@@ -148,7 +148,7 @@ const uupp = new uuaper({
 <!--- mockCache (是否每次请求都进行保存操作，依赖`mockDir`参数，默认`false`不开启)-->
 
 ## History
-- [3.5.3] 升级 `bird-auth` 版本，移除无效依赖包。
+- [3.6.0] 升级 `bird-auth` 版本，移除无效依赖包。
 - [3.5.2] 优化 url 验证逻辑，调整为正则匹配请求头的方式。
 - [3.5.1] 修复 SSE 通信没有触发 close 事件错误，增加 end 操作。
 - [3.5.0] 新增支持 SSE 请求的代理
